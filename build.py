@@ -261,7 +261,7 @@ Ejemplos:
     parser.add_argument(
         "--preview", "-p",
         action="store_true",
-        help="Abrir preview después de renderizar",
+        help="Abrir preview de manim durante el render",
     )
     parser.add_argument(
         "--combine", "-c",

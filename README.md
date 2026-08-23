@@ -50,9 +50,11 @@ El script `build.py` actúa como compilador/builder para los videos. Descubre au
 | `--list`, `-l` | Listar todas las escenas disponibles |
 | `--video`, `-v` | Renderizar video específico (nombre parcial) |
 | `--quality`, `-q` | Calidad: `low` (480p), `medium` (720p), `high` (1080p), `4k` |
-| `--preview`, `-p` | Abrir preview de manim durante render |
+| `--preview`, `-p` | Preview de manim durante el render (ventana nativa) |
 | `--open`, `-o` | Abrir video con reproductor del sistema después de renderizar |
 | `--combine`, `-c` | Combinar todas las escenas en un solo video |
+
+> **Diferencia `--preview` vs `--open`**: `--preview` abre la ventana nativa de manim durante el render (útil para debug). `--open` abre el video terminado con el reproductor del sistema (VLC, QuickTime, etc.).
 
 ### Ejemplos
 

@@ -41,12 +41,14 @@ python build.py --list                    # Listar escenas disponibles
 python build.py                          # Renderizar todas (calidad baja)
 python build.py --video intro            # Renderizar por nombre parcial
 python build.py --video IntroScene -q h  # Calidad alta
-python build.py --video intro -p         # Con preview de manim
+python build.py --video intro -p         # Preview de manim (durante render)
 python build.py --video intro -o         # Abrir con reproductor del sistema
 python build.py --combine                # Combinar todas en un video
 python build.py --combine -q high        # Combinar en alta calidad
 python build.py --combine -o             # Combinar y abrir resultado
 ```
+
+> **`--preview` vs `--open`**: `--preview` es la ventana nativa de manim durante el render. `--open` abre el video terminado con el reproductor del sistema.
 
 ### Calidades
 

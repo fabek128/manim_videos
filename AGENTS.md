@@ -41,9 +41,11 @@ python build.py --list                    # Listar escenas disponibles
 python build.py                          # Renderizar todas (calidad baja)
 python build.py --video intro            # Renderizar por nombre parcial
 python build.py --video IntroScene -q h  # Calidad alta
-python build.py --video intro -p         # Con preview automático
+python build.py --video intro -p         # Con preview de manim
+python build.py --video intro -o         # Abrir con reproductor del sistema
 python build.py --combine                # Combinar todas en un video
 python build.py --combine -q high        # Combinar en alta calidad
+python build.py --combine -o             # Combinar y abrir resultado
 ```
 
 ### Calidades
@@ -95,6 +97,8 @@ class MiEscena(Scene):
 - Siempre activar `.venv` antes de ejecutar manim o build.py
 - El script `build.py` acepta nombres parciales (case-insensitive)
 - `--combine` requiere ffmpeg instalado en el sistema
+- `--open` abre el video con el reproductor predeterminado (macOS: `open`, Linux: `xdg-open`, Windows: `start`)
+- `--preview` es el preview nativo de manim (se abre durante el render)
 - Los archivos en `media/` son output generado, no editar
 - Para agregar utilidades compartidas, usar `utils/`
 - Las escenas se descubren por herencia de `Scene`, no por nombre de archivo

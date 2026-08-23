@@ -32,6 +32,9 @@ python build.py --video intro
 # Renderizar en calidad alta con preview
 python build.py --video IntroScene --quality high --preview
 
+# Renderizar y abrir con el reproductor del sistema
+python build.py --video intro --open
+
 # Combinar todas las escenas en un solo video
 python build.py --combine
 ```
@@ -47,7 +50,8 @@ El script `build.py` actúa como compilador/builder para los videos. Descubre au
 | `--list`, `-l` | Listar todas las escenas disponibles |
 | `--video`, `-v` | Renderizar video específico (nombre parcial) |
 | `--quality`, `-q` | Calidad: `low` (480p), `medium` (720p), `high` (1080p), `4k` |
-| `--preview`, `-p` | Abrir preview después de renderizar |
+| `--preview`, `-p` | Abrir preview de manim durante render |
+| `--open`, `-o` | Abrir video con reproductor del sistema después de renderizar |
 | `--combine`, `-c` | Combinar todas las escenas en un solo video |
 
 ### Ejemplos
@@ -59,11 +63,17 @@ python build.py --list
 # Renderizar 'intro' en calidad media
 python build.py -v intro -q medium
 
+# Renderizar y abrir automáticamente
+python build.py -v intro -o
+
 # Renderizar todo en alta calidad con preview
 python build.py -q high -p
 
 # Combinar todas las escenas en un video
 python build.py --combine -q high
+
+# Combinar y abrir resultado
+python build.py --combine -o
 ```
 
 ### Uso directo de Manim

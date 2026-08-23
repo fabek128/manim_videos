@@ -7,10 +7,12 @@ Uso:
     python build.py --list             # Listar escenas disponibles
     python build.py --video intro      # Renderizar video específico
     python build.py --quality high     # Renderizar en calidad alta
+    python build.py --open             # Abrir video después de renderizar
     python build.py --combine          # Combinar todos en un solo video
 """
 
 import argparse
+import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +27,41 @@ QUALITY_FLAGS = {
     "high": "-qh",     # 1080p60
     "4k": "-qk",       # 2160p60
 }
+
+# Mapeo de calidad a subdirectorio de output
+QUALITY_DIRS = {
+    "low": "480p15",
+    "medium": "720p30",
+    "high": "1080p60",
+    "4k": "2160p60",
+}
+
+
+def open_video(file_path: Path) -> bool:
+    """Abre un video con el reproductor predeterminado del sistema."""
+    if not file_path.exists():
+        print(f"   ⚠ Archivo no encontrado: {file_path}")
+        return False
+
+    system = platform.system()
+    try:
+        if system == "Darwin":  # macOS
+            subprocess.run(["open", str(file_path)], check=True)
+        elif system == "Windows":
+            subprocess.run(["start", str(file_path)], shell=True, check=True)
+        elif system == "Linux":
+            subprocess.run(["xdg-open", str(file_path)], check=True)
+        else:
+            print(f"   ⚠ Sistema no soportado para abrir: {system}")
+            return False
+        print(f"   🎥 Abierto: {file_path.name}")
+        return True
+    except subprocess.CalledProcessError:
+        print(f"   ⚠ No se pudo abrir: {file_path}")
+        return False
+    except FileNotFoundError:
+        print(f"   ⚠ Comando no encontrado para abrir archivos en {system}")
+        return False
 
 
 def discover_scenes() -> dict[str, list[dict]]:
@@ -100,13 +137,13 @@ def find_scene_by_name(scenes: dict[str, list[dict]], name: str) -> Optional[dic
     return None
 
 
-def render_scene(scene: dict, quality: str = "low", preview: bool = False) -> bool:
+def render_scene(scene: dict, quality: str = "low", preview: bool = False, open_after: bool = False) -> bool:
     """Renderiza una escena individual."""
     quality_flag = QUALITY_FLAGS.get(quality, "-ql")
     cmd = ["manim", quality_flag, scene["path"], scene["class"]]
 
     if preview:
-        cmd.insert(1, "-p")  # Abrir preview después de renderizar
+        cmd.insert(1, "-p")  # Abrir preview de manim durante render
 
     print(f"\n🎬 Renderizando: {scene['class']} ({quality})")
     print(f"   Archivo: {scene['path']}")
@@ -115,6 +152,13 @@ def render_scene(scene: dict, quality: str = "low", preview: bool = False) -> bo
     try:
         subprocess.run(cmd, check=True, capture_output=False)
         print(f"   ✅ Completado: {scene['class']}")
+
+        # Abrir video con reproductor del sistema si se solicitó
+        if open_after:
+            quality_dir = QUALITY_DIRS.get(quality, "480p15")
+            video_path = MEDIA_DIR / "videos" / scene["file"].stem / quality_dir / f"{scene['class']}.mp4"
+            open_video(video_path)
+
         return True
     except subprocess.CalledProcessError as e:
         print(f"   ❌ Error renderizando {scene['class']}: {e}")
@@ -124,7 +168,7 @@ def render_scene(scene: dict, quality: str = "low", preview: bool = False) -> bo
         return False
 
 
-def combine_videos(scenes: dict[str, list[dict]], quality: str = "low") -> bool:
+def combine_videos(scenes: dict[str, list[dict]], quality: str = "low", open_after: bool = False) -> bool:
     """Combina múltiples escenas en un solo video usando ffmpeg."""
     # Primero renderizar todas las escenas
     print("\n📼 Renderizando escenas para combinar...\n")
@@ -134,10 +178,10 @@ def combine_videos(scenes: dict[str, list[dict]], quality: str = "low") -> bool:
         for scene in folder_scenes:
             if render_scene(scene, quality):
                 # Construir path del archivo renderizado
+                quality_dir = QUALITY_DIRS.get(quality, "480p15")
                 output_path = (
                     MEDIA_DIR / "videos" / scene["file"].stem /
-                    QUALITY_FLAGS[quality].replace("-q", "") /
-                    f"{scene['class']}.mp4"
+                    quality_dir / f"{scene['class']}.mp4"
                 )
                 if output_path.exists():
                     rendered_files.append(output_path)
@@ -168,6 +212,11 @@ def combine_videos(scenes: dict[str, list[dict]], quality: str = "low") -> bool:
         print(f"✅ Video combinado: {output_file}")
         # Limpiar archivo temporal
         list_file.unlink()
+
+        # Abrir video combinado si se solicitó
+        if open_after:
+            open_video(output_file)
+
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Error combinando videos: {e}")
@@ -186,8 +235,10 @@ Ejemplos:
   python build.py --list                    Listar escenas
   python build.py                          Renderizar todas
   python build.py --video intro            Renderizar 'intro'
+  python build.py --video intro -o         Renderizar y abrir
   python build.py --video IntroScene -q h  Renderizar en alta calidad
   python build.py --combine                Combinar todas en un video
+  python build.py --combine -o             Combinar y abrir resultado
         """,
     )
 
@@ -217,6 +268,11 @@ Ejemplos:
         action="store_true",
         help="Combinar todas las escenas en un solo video",
     )
+    parser.add_argument(
+        "--open", "-o",
+        action="store_true",
+        help="Abrir video con el reproductor del sistema después de renderizar",
+    )
 
     args = parser.parse_args()
 
@@ -240,7 +296,7 @@ Ejemplos:
 
     # Modo: combinar
     if args.combine:
-        success = combine_videos(scenes, args.quality)
+        success = combine_videos(scenes, args.quality, args.open)
         sys.exit(0 if success else 1)
 
     # Modo: renderizar específico
@@ -251,7 +307,7 @@ Ejemplos:
             print("   Usa --list para ver las escenas disponibles")
             sys.exit(1)
 
-        success = render_scene(scene, args.quality, args.preview)
+        success = render_scene(scene, args.quality, args.preview, args.open)
         sys.exit(0 if success else 1)
 
     # Modo: renderizar todos
@@ -263,7 +319,7 @@ Ejemplos:
     for folder, folder_scenes in scenes.items():
         print(f"\n📂 {folder}/")
         for scene in folder_scenes:
-            if render_scene(scene, args.quality, args.preview):
+            if render_scene(scene, args.quality, args.preview, args.open):
                 success_count += 1
             else:
                 fail_count += 1

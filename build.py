@@ -261,7 +261,13 @@ Ejemplos:
     parser.add_argument(
         "--preview", "-p",
         action="store_true",
-        help="Abrir preview de manim durante el render",
+        default=True,
+        help="Abrir preview de manim durante el render (default: True)",
+    )
+    parser.add_argument(
+        "--no-preview",
+        action="store_true",
+        help="Desactivar preview de manim",
     )
     parser.add_argument(
         "--combine", "-c",
@@ -275,6 +281,10 @@ Ejemplos:
     )
 
     args = parser.parse_args()
+
+    # --no-preview override --preview
+    if args.no_preview:
+        args.preview = False
 
     # Verificar que estamos en el directorio correcto
     if not VIDEOS_DIR.exists():

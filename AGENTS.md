@@ -38,17 +38,17 @@ Compilador/builder para renderizar videos. Descubre escenas automáticamente.
 
 ```bash
 python build.py --list                    # Listar escenas disponibles
-python build.py                          # Renderizar todas (calidad baja)
+python build.py                          # Renderizar todas (preview activado)
 python build.py --video intro            # Renderizar por nombre parcial
 python build.py --video IntroScene -q h  # Calidad alta
-python build.py --video intro -p         # Preview de manim (durante render)
+python build.py --video intro --no-preview  # Sin preview (más rápido)
 python build.py --video intro -o         # Abrir con reproductor del sistema
 python build.py --combine                # Combinar todas en un video
 python build.py --combine -q high        # Combinar en alta calidad
 python build.py --combine -o             # Combinar y abrir resultado
 ```
 
-> **`--preview` vs `--open`**: `--preview` es la ventana nativa de manim durante el render. `--open` abre el video terminado con el reproductor del sistema.
+> **`--preview` vs `--open`**: `--preview` es la ventana nativa de manim durante el render (activado por defecto). `--open` abre el video terminado con el reproductor del sistema. Usar `--no-preview` para desactivar el preview.
 
 ### Calidades
 

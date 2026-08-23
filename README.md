@@ -50,11 +50,12 @@ El script `build.py` actúa como compilador/builder para los videos. Descubre au
 | `--list`, `-l` | Listar todas las escenas disponibles |
 | `--video`, `-v` | Renderizar video específico (nombre parcial) |
 | `--quality`, `-q` | Calidad: `low` (480p), `medium` (720p), `high` (1080p), `4k` |
-| `--preview`, `-p` | Preview de manim durante el render (ventana nativa) |
+| `--preview`, `-p` | Preview de manim durante el render (default: activado) |
+| `--no-preview` | Desactivar preview de manim |
 | `--open`, `-o` | Abrir video con reproductor del sistema después de renderizar |
 | `--combine`, `-c` | Combinar todas las escenas en un solo video |
 
-> **Diferencia `--preview` vs `--open`**: `--preview` abre la ventana nativa de manim durante el render (útil para debug). `--open` abre el video terminado con el reproductor del sistema (VLC, QuickTime, etc.).
+> **Diferencia `--preview` vs `--open`**: `--preview` abre la ventana nativa de manim durante el render (útil para debug, activado por defecto). `--open` abre el video terminado con el reproductor del sistema (VLC, QuickTime, etc.).
 
 ### Ejemplos
 
@@ -62,14 +63,17 @@ El script `build.py` actúa como compilador/builder para los videos. Descubre au
 # Listar escenas
 python build.py --list
 
-# Renderizar 'intro' en calidad media
-python build.py -v intro -q medium
+# Renderizar 'intro' (preview activado por defecto)
+python build.py -v intro
+
+# Renderizar sin preview (más rápido)
+python build.py -v intro --no-preview
 
 # Renderizar y abrir automáticamente
 python build.py -v intro -o
 
-# Renderizar todo en alta calidad con preview
-python build.py -q high -p
+# Renderizar todo en alta calidad
+python build.py -q high
 
 # Combinar todas las escenas en un video
 python build.py --combine -q high

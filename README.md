@@ -11,14 +11,66 @@ videos/
     README.md         # Descripción del video (opcional)
 media/                # Output renderizado (auto-generado)
 utils/                # Utilidades compartidas
+build.py              # Script de compilación/renderizado
 ```
 
-## Uso
+## Uso rápido
 
 ```bash
 # Activar entorno virtual
 source .venv/bin/activate
 
+# Listar escenas disponibles
+python build.py --list
+
+# Renderizar todos los videos (calidad baja, rápido)
+python build.py
+
+# Renderizar video específico
+python build.py --video intro
+
+# Renderizar en calidad alta con preview
+python build.py --video IntroScene --quality high --preview
+
+# Combinar todas las escenas en un solo video
+python build.py --combine
+```
+
+## Script `build.py`
+
+El script `build.py` actúa como compilador/builder para los videos. Descubre automáticamente las escenas en `videos/` y las renderiza.
+
+### Opciones
+
+| Opción | Descripción |
+|--------|-------------|
+| `--list`, `-l` | Listar todas las escenas disponibles |
+| `--video`, `-v` | Renderizar video específico (nombre parcial) |
+| `--quality`, `-q` | Calidad: `low` (480p), `medium` (720p), `high` (1080p), `4k` |
+| `--preview`, `-p` | Abrir preview después de renderizar |
+| `--combine`, `-c` | Combinar todas las escenas en un solo video |
+
+### Ejemplos
+
+```bash
+# Listar escenas
+python build.py --list
+
+# Renderizar 'intro' en calidad media
+python build.py -v intro -q medium
+
+# Renderizar todo en alta calidad con preview
+python build.py -q high -p
+
+# Combinar todas las escenas en un video
+python build.py --combine -q high
+```
+
+### Uso directo de Manim
+
+También puedes usar Manim directamente:
+
+```bash
 # Renderizar un video (calidad baja, rápido)
 manim -pql videos/2026-08-22_intro/scene.py IntroScene
 
@@ -31,7 +83,14 @@ manim -pqk videos/2026-08-22_intro/scene.py IntroScene
 
 ## Convenciones
 
-- Cada video vive en su carpeta con fecha y tema
+- Cada video vive en su carpeta con fecha y tema: `videos/YYYY-MM-DD_tema/`
 - Nombre de archivo: `scene.py` (o descriptivo si hay múltiples)
-- Las escenas se nombran en PascalCase
+- Las escenas se nombran en PascalCase y heredan de `Scene`
 - Output renderizado va a `media/` (gitignored)
+- El script `build.py` descubre escenas automáticamente
+
+## Agregar un nuevo video
+
+1. Crear carpeta: `mkdir videos/2026-08-23_mi_tema/`
+2. Crear `scene.py` con la escena
+3. Ejecutar: `python build.py --video mi_tema`

@@ -208,7 +208,8 @@ templates/                # Prompts de diseño que funcionan como guías reutili
   este repo, leer siempre `skills/global.md` antes de escribir código. Si la
   tarea es de contenido para redes (placa, carrusel, story, caption, o
   "escribí algo sobre X"), leer además `skills/contenido.md`,
-  `docs/agent-mode.md` y el template correspondiente de `templates/posts/`.
+  `skills/generador_imagenes.md`, `docs/agent-mode.md` y el
+  template correspondiente de `templates/posts/`.
   Si la tarea corresponde a un tipo de video con skill específica
   (`skills/los_mas_usados.md`, etc.), leerla también. No esperar a que el
   usuario lo pida: las skills se levantan solas. Las skills son

@@ -1,0 +1,5 @@
+Pillow>=10.0
+opencv-python-headless>=4.10
+pydantic>=2.7
+requests>=2.31
+PyYAML>=6.0

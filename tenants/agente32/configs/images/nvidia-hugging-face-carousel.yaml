@@ -1,0 +1,58 @@
+project_name: "nvidia_hugging_face_carousel"
+output_dir: "nvidia_hugging_face_carousel"
+content_slug: "2026-08-28_nvidia-hugging-face"
+format: "carousel_square"
+template: "news_carousel"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+  code: "fonts/FiraCode-Regular.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+image_generation:
+  enabled: true
+  provider: "openrouter"
+  model: "draft"
+  prompt: "Fotografía editorial de un centro de datos moderno, primeros planos de racks de servidores y procesadores GPU con iluminación azul intensa, cables de fibra óptica brillantes, atmósfera tecnológica y corporativa, alta definición, composición cuadrada"
+  negative_prompt: "texto, letras, logos, marcas, personas, rostros, manos, apretón de manos, marcas de agua, borroso, distorsionado"
+  variations: 1
+
+slides:
+  - type: "cover"
+    title: "NVIDIA Y HUGGING FACE: QUÉ SE SABE Y QUÉ NO"
+    highlights: ["NVIDIA", "HUGGING FACE"]
+    subtitle: "Tecnología · Sin confirmación oficial"
+    entity_logos:
+      - "logos/nvidia/nvidia.svg"
+      - "logos/huggingface/huggingface.svg"
+    footer_text: "AGENTE E32"
+
+  - type: "text"
+    title: "QUÉ SE REPORTÓ"
+    body: "The Information afirmó el 26 de agosto que Nvidia acordó comprar Hugging Face por USD 12.900 millones. CNBC sumó una fuente propia que confirma conversaciones en curso."
+    footer_text: "AGENTE E32"
+
+  - type: "bullets"
+    title: "QUÉ HAY DE VERDAD"
+    bullets:
+      - "Confirmado por Nvidia o Hugging Face: nada"
+      - "The Information: dice que el trato ya está acordado"
+      - "Business Insider y TechCrunch: sin firma todavía"
+      - "Nvidia no salió a desmentir, algo inusual en la empresa"
+    footer_text: "AGENTE E32"
+
+  - type: "text"
+    title: "POR QUÉ IMPORTA"
+    body: "Si se confirma, el hub de modelos abiertos más usado de IA queda bajo el fabricante de GPUs líder del mercado. Afecta licencias, hosting y costos de inferencia de quien dependa del repositorio."
+    footer_text: "AGENTE E32"

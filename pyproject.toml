@@ -8,3 +8,8 @@ dependencies = ["manim>=0.21.0"]
 [tool.manim]
 # Configuración global de Manim
 media_dir = "media"
+
+[tool.ruff.lint]
+# Convención oficial de manim: `from manim import *` en las escenas
+# (ver AGENTS.md). F403/F405 son ruido para este patrón.
+ignore = ["F403", "F405"]

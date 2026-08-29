@@ -1,0 +1,35 @@
+project_name: "noticia_malaponte_square"
+output_dir: "noticia_malaponte_square"
+format: "post_square"
+template: "news_card"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+image_generation:
+  enabled: false
+  provider: "openrouter"
+  model: "google/gemini-3.1-flash-image"
+  prompt: "Retrato periodístico editorial frente al edificio de tribunales de Rosario, formato cuadrado"
+  negative_prompt: "blurry, distorted face, unreadable text"
+
+content:
+  title: "APROBARON EL PLIEGO Y FLORENTINO MALAPONTE SERÁ CAMARISTA FEDERAL DE ROSARIO"
+  highlights:
+    - "MALAPONTE"
+    - "SERÁ CAMARISTA"
+    - "FEDERAL DE ROSARIO"
+  subtitle: "Rosario · Información judicial"
+  footer_text: "AGENTE E32"

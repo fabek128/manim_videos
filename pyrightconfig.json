@@ -1,0 +1,18 @@
+{
+  // Usa el venv del repo para resolver imports (manim, utils, etc.)
+  "venvPath": ".",
+  "venv": ".venv",
+  // Convencion de manim: `from manim import *` en todas las escenas (AGENTS.md)
+  "reportWildcardImportFromLibrary": false,
+  "include": ["videos", "utils", "build.py"],
+  "exclude": ["media", "**/__pycache__"],
+
+  // Stubs de manim 0.21 generan falsos positivos en estos patrones
+  // (verificados: corren sin error en runtime)
+  "typeCheckingMode": "basic",
+  "reportOptionalOperand": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportOperatorIssue": "none",
+  "reportArgumentType": "none",
+  "reportCallIssue": "none"
+}

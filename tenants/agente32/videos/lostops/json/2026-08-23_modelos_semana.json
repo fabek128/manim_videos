@@ -1,0 +1,101 @@
+{
+    "titulo": [
+        "LOS MODELOS QUE MÁS",
+        "USÉ ESTA SEMANA"
+    ],
+    "subtitulo": "Semana del 17 al 23 de agosto",
+    "modelos": [
+        {
+            "nombre": "Ox Alpha",
+            "logo": "https://openrouter.ai/images/icons/Stealth.svg",
+            "provider": "OpenRouter",
+            "metrica": {
+                "etiqueta": "Tokens",
+                "valor": "712M"
+            },
+            "comentario": [
+                "Gratuito y anónimo",
+                "Análisis y refactorizaciones complejas"
+            ],
+            "specs": [
+                [
+                    "Contexto",
+                    "1M"
+                ],
+                [
+                    "Modalidad",
+                    "texto+visión"
+                ]
+            ]
+        },
+        {
+            "nombre": "Claude Opus 5",
+            "logo": "anthropic",
+            "provider": "Anthropic",
+            "metrica": {
+                "etiqueta": "Tokens",
+                "valor": "287M"
+            },
+            "comentario": [
+                "Planificación y razonamiento profundo",
+                "en funcionalidades complejas"
+            ],
+            "specs": [
+                [
+                    "Contexto",
+                    "400K"
+                ],
+                [
+                    "Modalidad",
+                    "texto+visión"
+                ]
+            ]
+        },
+        {
+            "nombre": "ChatGPT Luna",
+            "logo": "openai",
+            "provider": "OpenAI",
+            "metrica": {
+                "etiqueta": "Tokens",
+                "valor": "154M"
+            },
+            "comentario": [
+                "Modelo versátil, rápido y de costo muy bajo",
+                "Puede ser algo lento, pero cumple."
+            ],
+            "specs": [
+                [
+                    "Contexto",
+                    "1M"
+                ],
+                [
+                    "Modalidad",
+                    "multimodal"
+                ]
+            ]
+        },
+        {
+            "nombre": "DeepSeek V4 Flash 0731",
+            "logo": "deepseek",
+            "provider": "DeepSeek",
+            "metrica": {
+                "etiqueta": "Tokens",
+                "valor": "61M"
+            },
+            "comentario": [
+                "Prototipos rápidos y scripts de bajo costo",
+                "para tareas puntuales"
+            ],
+            "specs": [
+                [
+                    "Contexto",
+                    "1M"
+                ],
+                [
+                    "Precio",
+                    "N/D"
+                ]
+            ]
+        }
+    ]
+}

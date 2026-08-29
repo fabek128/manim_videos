@@ -1,0 +1,16 @@
+id: agente32
+name: "Agente E32"
+
+brand:
+  logo: "logos/agente32/agente32.svg"
+  default_theme: "theme_default"
+
+social:
+  instagram:
+    handle: "@fabian128k"
+
+publish:
+  namespace: "agente32"
+
+content:
+  default_post_template: "post_noticia"

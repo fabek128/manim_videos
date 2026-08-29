@@ -1,0 +1,37 @@
+project_name: "draft_smoke"
+output_dir: "draft_smoke"
+format: "post_square"
+template: "news_card"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+image_generation:
+  enabled: true
+  provider: "openrouter"
+  model: "draft"
+  prompt: "Fotografía editorial de una notebook abierta con gráficos de datos, iluminación azul, composición limpia y profesional, formato cuadrado"
+  width: 1080
+  height: 1080
+  seed: 42
+  variations: 1
+
+content:
+  title: "UNA IMAGEN DE PRUEBA PARA AGENTE E32"
+  highlights:
+    - "IMAGEN DE PRUEBA"
+  subtitle: "Borrador generado con IA"
+  footer_text: "AGENTE E32"
+  source_text: "Borrador"

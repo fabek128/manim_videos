@@ -6,8 +6,10 @@ class IntroScene(Scene):
 
     def construct(self):
         # Título
-        title = Text("Manim Videos", font_size=72, color=BLUE)
-        subtitle = Text("Mi colección de animaciones", font_size=36, color=GRAY)
+        title = Text("Manim Videos", font="Noto Sans", font_size=72, color=BLUE)
+        subtitle = Text(
+            "Mi colección de animaciones", font="Noto Sans", font_size=36, color=GRAY
+        )
 
         # Geometría decorativa
         circle = Circle(radius=1, color=YELLOW, fill_opacity=0.2)

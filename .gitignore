@@ -20,4 +20,11 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Local secrets
+.env
+.env.*
+!.env.example
+tenants/*/.env
+!tenants/*/.env.example
 *.swo

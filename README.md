@@ -181,6 +181,56 @@ informe profundo. Ver [`docs/news-generator.md`](docs/news-generator.md).
 Toda pieza visual pasa por el rol de visión antes de entregarse, con un
 máximo de 3 regeneraciones y detención en la cuarta evaluación fallida.
 
+## Instalación desde cero
+
+Requisitos del sistema:
+
+- Python `>=3.12`;
+- `uv` ([astral-sh/uv](https://github.com/astral-sh/uv));
+- manim, ffmpeg y ffprobe (paquetes de sistema; ver abajo);
+- Chromium de Playwright (solo para captura web).
+
+```bash
+# 1. Clonar y entrar
+git clone <url-del-repo> redes2 && cd redes2
+
+# 2. Entorno virtual + dependencias
+uv sync --group dev
+source .venv/bin/activate
+
+# 3. Herramientas externas (según sistema operativo)
+#    macOS:
+#      brew install ffmpeg
+#    Debian/Ubuntu:
+#      sudo apt install ffmpeg
+#    Componente de Manim: se instala con las dependencias Python (manim).
+
+# 4. Playwright (solo si vas a usar captura web)
+python -m playwright install chromium
+
+# 5. Configuración
+cp .env.example .env
+cp tenants/agente32/.env.example tenants/agente32/.env
+#    Editar .env según la máquina: PROMPTGATE_BASE_URL, OPENROUTER_API_KEY,
+#    FINAL_OUTPUT_DIR, etc.
+
+# 6. Diagnóstico
+python scripts/doctor.py --tenant agente32
+```
+
+## Modo headless
+
+En un servidor sin sesión gráfica, el preview de Manim está **desactivado
+por defecto**. Renderizar un video:
+
+```bash
+python build.py --tenant agente32 --video <video> --no-preview --no-post
+```
+
+La generación de textos del post requiere `PROMPTGATE_BASE_URL`
+configurado; sin endpoint, usar `--no-post` o el flujo fallará con un
+mensaje claro.
+
 ## Uso rápido
 
 ```bash
@@ -213,7 +263,7 @@ OpenAI-compatible, sin autenticación ni API key. La configuración vive en
 `.env`:
 
 ```env
-PROMPTGATE_BASE_URL=http://10.125.115.196:9000/v1
+PROMPTGATE_BASE_URL=https://endpoint.example/v1
 PROMPTGATE_AUTH=none
 PROMPTGATE_TIMEOUT=120
 PROMPTGATE_MODEL=coder-rata
@@ -277,14 +327,13 @@ python scripts/publish_final.py \
 
 La variable `FINAL_OUTPUT_DIR` de `.env` define la raíz opcional; si no se
 indica, el namespace del tenant (`tenant.yaml` → `publish.namespace`)
-aisla la salida bajo `Documents/shared/<namespace>/`:
+aisla la salida bajo `<FINAL_OUTPUT_DIR>/<namespace>/`:
 
 ```text
-/Users/fabian/Documents/shared/agente32/
+$FINAL_OUTPUT_DIR/agente32/
   videos/<YYYY-MM-DD>_<slug>/
   images/<YYYY-MM-DD>_<slug>/
 ```
-
 `--force` es necesario para reemplazar archivos ya publicados.
 
 ## Script `build.py`
@@ -386,12 +435,11 @@ OpenAI-compatible, sin autenticación ni API key. La configuración vive en
 `.env`:
 
 ```env
-PROMPTGATE_BASE_URL=http://10.125.115.196:9000/v1
+PROMPTGATE_BASE_URL=https://endpoint.example/v1
 PROMPTGATE_AUTH=none
 PROMPTGATE_TIMEOUT=120
 PROMPTGATE_MODEL=coder-rata
 ```
-
 Modelos OpenRouter para generación de imágenes:
 
 ```env
@@ -454,11 +502,11 @@ python scripts/publish_final.py \
   --slug modelos-semana
 ```
 
-La variable `FINAL_OUTPUT_DIR` de `.env` define la raíz. El script crea los
-directorios solo al publicar:
+La variable `FINAL_OUTPUT_DIR` de `.env` define la raíz (obligatoria para
+publicar). El script crea los directorios solo al publicar:
 
 ```text
-/Users/fabian/Documents/shared/
+$FINAL_OUTPUT_DIR/
   videos/<YYYY-MM-DD>_<slug>/
   images/<YYYY-MM-DD>_<slug>/
 ```

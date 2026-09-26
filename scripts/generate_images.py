@@ -83,7 +83,7 @@ def main() -> int:
         result = generate(
             config, tenant, quality=args.quality, reuse_intermediate=args.reuse_intermediate
         )
-    except (FileNotFoundError, ValueError, OSError, ImageProviderError) as exc:
+    except (FileNotFoundError, ValueError, OSError, ImageProviderError, RuntimeError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     for path in result.paths:

@@ -47,17 +47,19 @@ def _load_dotenv(path: Path) -> None:
 
 
 def _final_root(tenant: TenantContext) -> Path:
-    """Raíz de publicación: del tenant manifest o FINAL_OUTPUT_DIR."""
+    """Raíz de publicación: FINAL_OUTPUT_DIR obligatorio (tenant manifest o entorno)."""
     value = os.environ.get("FINAL_OUTPUT_DIR")
     if value:
         root = Path(value).expanduser()
         if not root.is_absolute():
             raise ValueError("FINAL_OUTPUT_DIR debe ser una ruta absoluta")
         return root
-    # Default namespace-isolated publish root del tenant.
-    namespace = tenant.manifest.publish.namespace
-    root = Path("/Users/fabian/Documents/shared") / namespace
-    return root
+    # Fallback portable: apuntar a un directorio dentro del repo para evitar
+    # rutas personales, pero exigir FINAL_OUTPUT_DIR en publicación real.
+    raise ValueError(
+        "Falta FINAL_OUTPUT_DIR: definilo en .env o exportalo para publicar. "
+        "Ejemplo: FINAL_OUTPUT_DIR=/ruta/absoluta/de/salida"
+    )
 
 def _validate_slug(value: str, label: str) -> str:
     if not SLUG_RE.fullmatch(value):
@@ -107,7 +109,7 @@ def publish(args: argparse.Namespace, tenant: TenantContext) -> list[Path]:
         raise ValueError("--date debe tener formato YYYY-MM-DD")
 
     # `root` ya incluye el namespace del tenant por defecto
-    # (`Documents/shared/<namespace>`). El tipo decide el subdirectorio;
+    # (`<FINAL_OUTPUT_DIR>/<namespace>`). El tipo decide el subdirectorio;
     # no repetir el namespace en la ruta final.
     content_type = "videos" if args.type == "videos" else "images"
     destination = root / content_type / f"{content_date}_{slug}"
@@ -143,12 +145,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     _load_dotenv(ENV_PATH)
+    args = parse_args()
     try:
-        tenant = load_tenant()
-    except (FileNotFoundError, OSError) as exc:
+        tenant = load_tenant(args.tenant)
+    except (FileNotFoundError, OSError, ValueError) as exc:
         print(f"⚠ Configuración de tenant omitida: {exc}", file=sys.stderr)
         tenant = None
-    args = parse_args()
     try:
         if tenant is None:
             # Fallback legacy sin tenant (rutas relativas al repo).
@@ -161,7 +163,6 @@ def main() -> int:
     for output in outputs:
         print(output)
     return 0
-
 
 def _make_legacy_tenant() -> TenantContext:
     """Tenant de respaldo que resuelve rutas relativas al repo raíz."""

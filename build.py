@@ -428,6 +428,11 @@ def _selected_background_metadata(spec, scene: dict) -> str | None:
     return background.name if background is not None else None
 
 
+def _python_exe() -> str:
+    """Interprete del venv actual (o 'python3' si no hay venv)."""
+    return sys.executable or "python3"
+
+
 def render_scene(
     scene: dict,
     quality: str = "low",
@@ -438,8 +443,9 @@ def render_scene(
 ) -> bool:
     if scene.get("engine") == "web":
         return _render_web_scene(scene, quality, open_after, fmt, generate_post)
+    python_exe = _python_exe()
     quality_flag = QUALITY_FLAGS.get(quality, "-ql")
-    cmd = ["manim", quality_flag, "--media_dir", str(MEDIA_DIR)]
+    cmd = [python_exe, "-m", "manim", quality_flag, "--media_dir", str(MEDIA_DIR)]
     # Deshabilitar caché para generadores declarativos (config/seed son inputs externos)
     if scene.get("is_generator"):
         cmd.append("--disable_caching")
@@ -523,7 +529,82 @@ def render_scene(
         print(f"   ❌ Error renderizando {scene['class']}: {e}")
         return False
     except FileNotFoundError:
-        print("   ❌ Error: manim no encontrado. ¿Activaste el venv?")
+        print("   ❌ Error: no se encontro el interprete de Python del entorno. ¿Activaste el venv?")
+        return False
+    print(f"   Archivo: {scene['path']}")
+    print(f"   Comando: {' '.join(cmd)}\n")
+    try:
+        tenant_id = ACTIVE_TENANT.id if ACTIVE_TENANT else os.environ.get("TENANT", "")
+        python_path = os.pathsep.join(
+            [str(REPO_ROOT), str(REPO_ROOT / "src"), os.environ.get("PYTHONPATH", "")]
+        )
+        env = {
+            **os.environ,
+            "TENANT": tenant_id,
+            "PYTHONPATH": python_path,
+        }
+        # Inyectar variables del generador si aplica
+        if scene.get("is_generator"):
+            if scene.get("config_path"):
+                env["VIDEO_CONFIG"] = str(scene["config_path"])
+            if scene.get("seed") is not None:
+                env["RENDER_SEED"] = str(scene["seed"])
+            if scene.get("generator_id"):
+                env["VIDEO_GENERATOR_ID"] = str(scene["generator_id"])
+        subprocess.run(cmd, check=True, capture_output=False, env=env)
+        rendered_path = _manim_output_path_for(scene, quality, fmt)
+        output_path = output_path_for(scene, quality, fmt)
+        if rendered_path != output_path:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            rendered_path.replace(output_path)
+        trim_audio_to_video(output_path)
+        print(f"   ✅ Completado: {scene['class']}")
+        print(f"   📦 Salida: {output_path}")
+        # Guardar metadata para generadores
+        if scene.get("is_generator"):
+            try:
+                from noticia_carrusel.video_generators.top.loader import load_top_spec
+                spec = load_top_spec(Path(scene["config_path"]))
+                selected_background = _selected_background_metadata(spec, scene)
+                meta = {
+                    "tenant": tenant_id,
+                    "generator": scene.get("generator_id"),
+                    "implementation": scene.get("implementation_source", "global"),
+                    "config": Path(scene["config_path"]).name if scene.get("config_path") else None,
+                    "seed": scene.get("seed"),
+                    "video_duration_s": None,
+                    "audio_duration_s": None,
+                    "selected_background": selected_background,
+                }
+                # Intentar extraer duración del video con ffprobe
+                try:
+                    probe = subprocess.run(
+                        ["ffprobe", "-v", "error", "-show_entries", "stream=duration", "-of", "json", str(output_path)],
+                        capture_output=True, text=True
+                    )
+                    data = json.loads(probe.stdout)
+                    for s in data.get("streams", []):
+                        if s.get("duration"):
+                            meta["video_duration_s"] = float(s["duration"])
+                            break
+                except Exception:
+                    pass
+                meta_path = output_path.parent / "render_metadata.json"
+                meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                print(f"   📝 Metadata: {meta_path}")
+            except Exception as exc:
+                print(f"   ⚠ No se pudo guardar metadata: {exc}")
+        if generate_post:
+            generate_post_summary(scene)
+        if open_after:
+            video_path = output_path_for(scene, quality, fmt)
+            open_video(video_path)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"   ❌ Error renderizando {scene['class']}: {e}")
+        return False
+    except FileNotFoundError:
+        print("   ❌ Error: no se encontro el interprete de Python del entorno. ¿Activaste el venv?")
         return False
 
 
@@ -533,7 +614,6 @@ def combine_videos(
     open_after: bool = False,
     generate_post: bool = True,
 ) -> bool:
-    print("\n📼 Renderizando escenas para combinar...\n")
     rendered_files = []
     for folder_scenes in scenes.values():
         for scene in folder_scenes:
@@ -567,7 +647,7 @@ def combine_videos(
         print(f"❌ Error combinando videos: {e}")
         return False
     except FileNotFoundError:
-        print("❌ Error: ffmpeg no encontrado. Instala con: brew install ffmpeg")
+        print("❌ Error: ffmpeg no encontrado. Instalalo con el gestor de paquetes de tu sistema (ej: brew install ffmpeg / apt install ffmpeg)")
         return False
 
 
@@ -614,8 +694,8 @@ Ejemplos:
     parser.add_argument("--video", "-v", type=str, help="Renderizar video específico (nombre parcial)")
     parser.add_argument("--quality", "-q", choices=["low", "medium", "high", "4k"], default="low", help="Calidad de renderizado (default: low)")
     parser.add_argument("--format", "-f", help="Formato Instagram con resolucion custom: reel (1080x1920@30) o post (1080x1440@30)")
-    parser.add_argument("--preview", "-p", action="store_true", default=True, help="Abrir preview de manim durante el render (default: True)")
-    parser.add_argument("--no-preview", action="store_true", help="Desactivar preview de manim")
+    parser.add_argument("--preview", "-p", action="store_true", default=False, help="Abrir preview de manim durante el render (default: False)")
+    parser.add_argument("--no-preview", action="store_true", help="Desactivar preview de manim (ya es default)")
     parser.add_argument("--combine", "-c", action="store_true", help="Combinar todas las escenas en un solo video")
     parser.add_argument("--open", "-o", action="store_true", help="Abrir video con el reproductor del sistema después de renderizar")
     parser.add_argument("--no-post", action="store_true", help="No generar el texto del post asociado")

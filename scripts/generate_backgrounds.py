@@ -175,8 +175,9 @@ def main() -> int:
         status = "passed" if clean else "stopped_after_3_retries"
         with Image.open(output_path) as generated_image:
             actual_size = list(generated_image.size)
-        review_entries.append({"index": index, "path": str(output_path), "attempts": attempts, "status": status, "actual_size": actual_size})
-        run_entries.append({"index": index, "path": str(output_path), "reused": False, "cost_usd": total_cost, "actual_size": actual_size})
+        rel = output_path.relative_to(output_dir)
+        review_entries.append({"index": index, "path": str(rel), "attempts": attempts, "status": status, "actual_size": actual_size})
+        run_entries.append({"index": index, "path": str(rel), "reused": False, "cost_usd": total_cost, "actual_size": actual_size})
         if not clean:
             print("Se detiene la generación: un fondo no pasó Vision QA tras 3 reintentos.", file=sys.stderr)
             _write_json(output_dir / "vision_review.json", {"generated_at": dt.datetime.now().isoformat(), "items": review_entries})

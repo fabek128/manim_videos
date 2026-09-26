@@ -5,16 +5,20 @@ import sys
 from io import BytesIO
 from pathlib import Path
 
-if sys.platform == "darwin":
-    brew_lib = Path("/opt/homebrew/lib")
-    if brew_lib.is_dir():
-        current = os.environ.get("DYLD_LIBRARY_PATH", "")
-        os.environ["DYLD_LIBRARY_PATH"] = f"{brew_lib}:{current}" if current else str(brew_lib)
-
 try:
     import cairosvg
 except (ImportError, OSError):
     cairosvg = None
+    if sys.platform == "darwin":
+        # Fundido a las librerías de cairo del sistema si Homebrew las expone.
+        brew_lib = Path("/opt/homebrew/lib")
+        if brew_lib.is_dir():
+            current = os.environ.get("DYLD_LIBRARY_PATH", "")
+            os.environ["DYLD_LIBRARY_PATH"] = f"{brew_lib}:{current}" if current else str(brew_lib)
+    try:
+        import cairosvg  # noqa: F811
+    except (ImportError, OSError):
+        cairosvg = None
 
 from PIL import Image, ImageDraw
 
@@ -83,7 +87,12 @@ class NewsCardRenderer:
 
     def _load_image_asset(self, path: Path, max_size: tuple[int, int]) -> Image.Image | None:
         try:
-            if path.suffix.lower() == ".svg" and cairosvg is not None:
+            if path.suffix.lower() == ".svg":
+                if cairosvg is None:
+                    raise RuntimeError(
+                        f"cairosvg no disponible para renderizar SVG {path}. "
+                        "Instalalo: pip install cairosvg (o uv pip install cairosvg)"
+                    )
                 png_bytes = cairosvg.svg2png(url=str(path), output_width=720)
                 image = Image.open(BytesIO(png_bytes)).convert("RGBA")
             elif path.suffix.lower() != ".svg":

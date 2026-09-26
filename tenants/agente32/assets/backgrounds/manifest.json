@@ -10,7 +10,7 @@
   "items": [
     {
       "index": 1,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_01_neural-network.png",
+      "path": "bg_01_neural-network.png",
       "reused": false,
       "cost_usd": 0.100827,
       "actual_size": [
@@ -20,7 +20,7 @@
     },
     {
       "index": 2,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_02_data-center.png",
+      "path": "bg_02_data-center.png",
       "reused": false,
       "cost_usd": 0.1008275,
       "actual_size": [
@@ -30,7 +30,7 @@
     },
     {
       "index": 3,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_03_robotic-arm.png",
+      "path": "bg_03_robotic-arm.png",
       "reused": false,
       "cost_usd": 0.1008275,
       "actual_size": [
@@ -40,7 +40,7 @@
     },
     {
       "index": 4,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_04_humanoid-robot.png",
+      "path": "bg_04_humanoid-robot.png",
       "reused": false,
       "cost_usd": 0.100826,
       "actual_size": [
@@ -50,7 +50,7 @@
     },
     {
       "index": 5,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_05_biotech-lab.png",
+      "path": "bg_05_biotech-lab.png",
       "reused": false,
       "cost_usd": 0.1008275,
       "actual_size": [
@@ -60,7 +60,7 @@
     },
     {
       "index": 6,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_06_quantum-computing.png",
+      "path": "bg_06_quantum-computing.png",
       "reused": false,
       "cost_usd": 0.100827,
       "actual_size": [
@@ -70,7 +70,7 @@
     },
     {
       "index": 7,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_07_space-satellite.png",
+      "path": "bg_07_space-satellite.png",
       "reused": false,
       "cost_usd": 0.100827,
       "actual_size": [
@@ -80,7 +80,7 @@
     },
     {
       "index": 8,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_08_cybersecurity.png",
+      "path": "bg_08_cybersecurity.png",
       "reused": false,
       "cost_usd": 0.1008285,
       "actual_size": [
@@ -90,7 +90,7 @@
     },
     {
       "index": 9,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_09_autonomous-vehicle.png",
+      "path": "bg_09_autonomous-vehicle.png",
       "reused": false,
       "cost_usd": 0.100828,
       "actual_size": [
@@ -100,7 +100,7 @@
     },
     {
       "index": 10,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_10_materials-science.png",
+      "path": "bg_10_materials-science.png",
       "reused": false,
       "cost_usd": 0.100827,
       "actual_size": [
@@ -110,7 +110,7 @@
     },
     {
       "index": 11,
-      "path": "/Users/fabian/code/personal/redes2/tenants/agente32/assets/backgrounds/bg_11_astra-cybersecurity.png",
+      "path": "bg_11_astra-cybersecurity.png",
       "reused": false,
       "cost_usd": 0.1008345,
       "actual_size": [

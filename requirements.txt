@@ -1,6 +1,3 @@
-Pillow>=10.0
-opencv-python-headless>=4.10
-pydantic>=2.7
-requests>=2.31
-PyYAML>=6.0
-playwright>=1.47
+# Dependencias runtime unificadas en pyproject.toml (fuente única).
+# Instalar con: uv sync  o  uv pip install -e .
+# Para desarrollo: uv sync --group dev

@@ -19,7 +19,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-DEFAULT_BASE_URL = "http://10.125.115.196:9000/v1"
+DEFAULT_BASE_URL: str | None = None  # Sin default privado: exigir PROMPTGATE_BASE_URL
 DEFAULT_TIMEOUT = 120.0
 MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 
@@ -39,8 +39,13 @@ def _load_dotenv(path: Path) -> None:
             os.environ[key] = value
 
 
-def _base_url() -> str:
-    value = os.environ.get("PROMPTGATE_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
+def _base_url() -> str | None:
+    value = os.environ.get("PROMPTGATE_BASE_URL", "").strip().rstrip("/")
+    if not value:
+        raise ValueError(
+            "Falta PROMPTGATE_BASE_URL en el entorno: definilo en .env o "
+            "exportalo (ej: https://endpoint.example/v1) para usar PromptGate"
+        )
     if not value.startswith(("http://", "https://")):
         raise ValueError("PROMPTGATE_BASE_URL debe usar http:// o https://")
     if "@" in value.split("://", 1)[1].split("/", 1)[0]:

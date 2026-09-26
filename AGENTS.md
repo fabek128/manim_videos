@@ -229,17 +229,23 @@ costo ni llamadas) y `_base_image(..., reuse_intermediate=True)`
 ## Setup
 
 ```bash
-# Crear el venv desde cero (requiere `uv` en ~/.local/bin y Python 3.12):
-uv venv .venv --python 3.12
+# Crear el venv desde cero (requiere `uv` y Python 3.12):
+uv sync --group dev
 source .venv/bin/activate
 
-uv pip install "manim>=0.21.0"   # o: uv pip install -e .
+# Herramientas externas del sistema (según SO):
+#   macOS:  brew install ffmpeg
+#   Debian: sudo apt install ffmpeg
 
-# ffmpeg se instala aparte, a nivel sistema:
-#   brew install ffmpeg
+# Playwright (solo captura web):
+python -m playwright install chromium
 
-# Verificación rápida:
-python -c "import manim; print(manim.__version__)"
+# Configuración inicial (sin secretos reales, editarlos después):
+cp .env.example .env
+cp tenants/agente32/.env.example tenants/agente32/.env
+
+# Verificación:
+python scripts/doctor.py --tenant agente32
 ```
 
 ## Estructura del proyecto
@@ -387,24 +393,22 @@ si este documento y una skill discrepan, manda ESTE documento.
   usando el modelo `coder-rata` a través de PromptGate.
 - Esto incluye textos dentro de videos, títulos, subtítulos, descripciones,
   comentarios, captions, resúmenes, noticias y textos generados por scripts.
-- La configuración debe tomarse de `.env` (`PROMPTGATE_MODEL=coder-rata`);
-  no inventar otro proveedor, modelo ni endpoint.
-- El agente puede corregir ortografía, gramática, claridad y tono directamente,
-  pero debe conservar los datos factuales y no inventar métricas, fechas,
-  nombres, precios ni capacidades.
-
 ## Publicación final tras aprobación explícita
 
 - `build.py` y los generadores deben guardar primero los resultados en `media/`.
 - Nunca copiar automáticamente videos o imágenes a la carpeta compartida.
 - Solo después de que el usuario dé una aprobación explícita (`OK`,
   `aprobado`, `publicar` o equivalente), copiar el archivo validado a
-  `/Users/fabian/Documents/shared`, usando `scripts/publish_final.py`.
+  `$FINAL_OUTPUT_DIR/<namespace>`, usando `scripts/publish_final.py`.
+- `FINAL_OUTPUT_DIR` se configura en `.env` (ruta absoluta de la máquina);
+  `publish_final.py` falla con un mensaje claro si falta.
 - Agrupar siempre por tipo y fecha:
-  `/Users/fabian/Documents/shared/videos/<YYYY-MM-DD>_<slug>/` o
-  `/Users/fabian/Documents/shared/images/<YYYY-MM-DD>_<slug>/`.
+  `$FINAL_OUTPUT_DIR/<namespace>/videos/<YYYY-MM-DD>_<slug>/` o
+  `$FINAL_OUTPUT_DIR/<namespace>/images/<YYYY-MM-DD>_<slug>/`.
 - No interpretar una revisión, un comentario positivo o el fin del render como
   aprobación para publicar.
+
+
 
 ## Generador de imágenes y carruseles
 
@@ -446,8 +450,8 @@ python scripts/generate_videos.py --tenant agente32 --video lostops --no-preview
   `assets/fonts/FiraCode-Regular.ttf`, numeración de líneas y panel
   monoespaciado. No usar la IA para escribir el código del slide.
 - Antes de publicar, revisar visualmente cada imagen y corregir los
-  textos; no copiar nada a `/Users/fabian/Documents/shared` sin
-  aprobación explícita.
+  textos; no copiar nada a `$FINAL_OUTPUT_DIR` sin aprobación explícita.
+
 
 ## Multi-tenancy
 

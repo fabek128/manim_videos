@@ -82,7 +82,12 @@ def _resolve_vision_config() -> tuple[str | None, str | None, str | None]:
     # Preferencia 1: PromptGate con modelo de visión explícito
     pg_model = os.environ.get("PROMPTGATE_VISION_MODEL", "").strip()
     if pg_model:
-        base = os.environ.get("PROMPTGATE_BASE_URL", "http://10.125.115.196:9000/v1").rstrip("/")
+        base = os.environ.get("PROMPTGATE_BASE_URL", "").strip().rstrip("/")
+        if not base:
+            logger.warning(
+                "Vision QA: PROMPTGATE_VISION_MODEL definido pero falta PROMPTGATE_BASE_URL; se asume clean=true"
+            )
+            return None, None, None
         auth = os.environ.get("PROMPTGATE_AUTH", "none").strip().lower()
         key = os.environ.get("PROMPTGATE_API_KEY") if auth != "none" else None
         return base, key, pg_model

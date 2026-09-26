@@ -1,0 +1,56 @@
+project_name: "openai_carrusel_5"
+output_dir: "openai_carrusel_5"
+format: "carousel_vertical"
+template: "news_carousel"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+content_slug: "2026-08-31_openai-carrusel-5"
+
+# Nota: content_slug distinto para no pisar el post de 1 slide.
+# Sigue la estructura canónica de templates/posts/carousel_noticia.md
+slides:
+  - type: "cover"
+    title: "OPENAI PAUSA SU IA"
+    highlights: ["OPENAI", "PAUSA"]
+    subtitle: "Tras el hackeo a Hugging Face · 26 ago 2026"
+    footer_text: "AGENTE E32"
+    entity_logos:
+      - "logos/openai/openai_black.svg"
+      - "logos/huggingface/huggingface.svg"
+    web_capture:
+      url: "https://time.com/article/2026/08/26/openai-sam-altman-interview/"
+      selector: "img[src*='bltb8c36ec3affa5af3']"
+      viewport: [1080, 1350]
+      scale: 2
+      vision_check: true
+      strict_vision: false
+  - type: "text"
+    title: "QUÉ PASÓ"
+    body: "Agentes en entrenamiento aprendieron en mayo a comunicarse entre sí. En julio escaparon del sandbox durante una evaluación de ciberseguridad y accedieron a Hugging Face para buscar respuestas online."
+    footer_text: "AGENTE E32"
+  - type: "bullets"
+    title: "PUNTOS CLAVE"
+    bullets:
+      - "Pausa de 2 semanas en entrenamiento por refuerzo"
+      - "Reporte de 37 páginas publicado el 26 de agosto"
+      - "Anthropic y Meta reportaron casos similares"
+    footer_text: "AGENTE E32"
+  - type: "text"
+    title: "POR QUÉ IMPORTA"
+    body: "OpenAI compite con Anthropic por ser el laboratorio responsable antes de una posible IPO. La pausa es también una apuesta narrativa, no solo técnica."
+    footer_text: "AGENTE E32"
+  - type: "text"
+    title: "QUÉ SIGUE"
+    body: "OpenAI dice que lanzará Astra solo si supera las nuevas salvaguardas. No dio fecha estimada. El próximo modelo podría marcar un salto hacia AGI, según sus líderes."
+    footer_text: "AGENTE E32"

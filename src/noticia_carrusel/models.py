@@ -8,7 +8,11 @@ if TYPE_CHECKING:
 
 from pydantic import BaseModel, Field, model_validator
 
+from .web_capture.models import CaptureConfig
+
 SlideType = Literal["cover", "text", "bullets", "code"]
+BackgroundMode = Literal["pool", "solid"]
+
 
 
 class BrandConfig(BaseModel):
@@ -74,6 +78,19 @@ class ImageGenerationConfig(BaseModel):
     variations: int = Field(default=1, ge=1, le=4)
 
 
+class WebCaptureConfig(CaptureConfig):
+    """Fondo de un slide capturado de una URL (ver `web_capture/`).
+
+    Extiende `CaptureConfig` (misma validación de `url`, `viewport`,
+    `scale`, `selector`, esperas, etc.) con `padding`: si hay `selector`,
+    deja aire alrededor del elemento capturado antes del recorte al aspect
+    ratio del post (ver `generator.py::_base_image`). Sin cámara ni zoom
+    animado — un post es un frame único.
+    """
+
+    padding: float = Field(default=0.0, ge=0.0, le=0.5)
+
+
 class SlideConfig(BaseModel):
     type: SlideType = "cover"
     title: str = ""
@@ -86,11 +103,25 @@ class SlideConfig(BaseModel):
     source_text: str = ""
     background_image_path: str | None = None
     image_generation: ImageGenerationConfig | None = None
+    web_capture: WebCaptureConfig | None = None
     entity_logos: list[str] = Field(
         default_factory=list,
         description="Logos SVG/PNG de las entidades mencionadas (paths relativos a assets/)",
     )
 
+    @model_validator(mode="after")
+    def _single_background_source(self) -> "SlideConfig":
+        active = (
+            bool(self.background_image_path),
+            bool(self.image_generation and self.image_generation.enabled),
+            self.web_capture is not None,
+        )
+        if sum(active) > 1:
+            raise ValueError(
+                "SlideConfig admite una sola fuente de fondo activa a la vez: "
+                "background_image_path, image_generation.enabled o web_capture"
+            )
+        return self
 
 class ContentConfig(BaseModel):
     title: str
@@ -114,6 +145,10 @@ class AppConfig(BaseModel):
     margin: MarginConfig = Field(default_factory=MarginConfig)
     image_generation: ImageGenerationConfig = Field(default_factory=ImageGenerationConfig)
     background_image_path: str | None = None
+    background_mode: BackgroundMode = Field(
+        default="pool",
+        description="pool selecciona assets/backgrounds/; solid conserva el fondo procedural",
+    )
     title: str | None = None
     subtitle: str = ""
     highlights: list[str] = Field(default_factory=list)

@@ -1,0 +1,40 @@
+{
+  "attempts": [
+    {
+      "attempt": 1,
+      "path": "tenants/agente32/content/2026-09-02_openai-astra/renders/slide_01.png",
+      "clean": true,
+      "issues": [],
+      "confidence": 0.95
+    },
+    {
+      "attempt": 1,
+      "path": "tenants/agente32/content/2026-09-02_openai-astra/renders/slide_02.png",
+      "clean": true,
+      "issues": [],
+      "confidence": 0.95
+    },
+    {
+      "attempt": 1,
+      "path": "tenants/agente32/content/2026-09-02_openai-astra/renders/slide_03.png",
+      "clean": true,
+      "issues": [],
+      "confidence": 0.95
+    },
+    {
+      "attempt": 1,
+      "path": "tenants/agente32/content/2026-09-02_openai-astra/renders/slide_04.png",
+      "clean": true,
+      "issues": [],
+      "confidence": 0.95
+    },
+    {
+      "attempt": 1,
+      "path": "tenants/agente32/content/2026-09-02_openai-astra/renders/slide_05.png",
+      "clean": true,
+      "issues": [],
+      "confidence": 0.95
+    }
+  ],
+  "status": "passed"
+}

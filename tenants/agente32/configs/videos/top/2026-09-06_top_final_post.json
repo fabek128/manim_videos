@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "title": [
+    "LOS MODELOS QUE",
+    "MÁS USÉ EN LA SEMANA"
+  ],
+  "subtitle": "RANKING PERSONAL · 1 AL 6 DE SEPTIEMBRE",
+  "audio": {
+    "asset": "sounds/intros/SunsetDrift.mp3",
+    "gain_db": -4.0
+  },
+  "background_image_path": "backgrounds/bg_01_neural-network.png",
+  "final_hold_seconds": 5.0,
+  "items": [
+    {
+      "name": "ChatGPT Luna",
+      "visual_asset": "openai",
+      "secondary_text": "OpenAI",
+      "metric": {
+        "label": "Tokens",
+        "value": "445M"
+      },
+      "comment": [
+        "Sigo enamorado de este modelo, es el más barato y rendidor."
+      ],
+      "specs": [
+        {"label": "Proveedor", "value": "OpenAI"},
+        {"label": "Estado", "value": "Top semanal"}
+      ]
+    },
+    {
+      "name": "Claude Opus 5",
+      "visual_asset": "anthropic",
+      "secondary_text": "Anthropic",
+      "metric": {
+        "label": "Tokens",
+        "value": "260M"
+      },
+      "comment": [
+        "Razono profundo y sin cortar el plan a mitad de camino."
+      ],
+      "specs": [
+        {"label": "Proveedor", "value": "Anthropic"},
+        {"label": "Estado", "value": "Top semanal"}
+      ]
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "visual_asset": "google",
+      "secondary_text": "Google",
+      "metric": {
+        "label": "Tokens",
+        "value": "205M"
+      },
+      "comment": [
+        "Lo uso cuando toca mezclar texto con imágenes y código."
+      ],
+      "specs": [
+        {"label": "Proveedor", "value": "Google"},
+        {"label": "Estado", "value": "Top semanal"}
+      ]
+    },
+    {
+      "name": "DeepSeek V4 Flash 0731",
+      "visual_asset": "deepseek",
+      "secondary_text": "DeepSeek",
+      "metric": {
+        "label": "Tokens",
+        "value": "170M"
+      },
+      "comment": [
+        "Mi caballito de batalla para scripts cortos y baratos."
+      ],
+      "specs": [
+        {"label": "Proveedor", "value": "DeepSeek"},
+        {"label": "Estado", "value": "Top semanal"}
+      ]
+    },
+    {
+      "name": "Llama 4 Maverick",
+      "visual_asset": "meta",
+      "secondary_text": "Meta",
+      "metric": {
+        "label": "Tokens",
+        "value": "137M"
+      },
+      "comment": [
+        "Lo pruebo en local cuando quiero experimentar sin pagar."
+      ],
+      "specs": [
+        {"label": "Proveedor", "value": "Meta"},
+        {"label": "Estado", "value": "Top semanal"}
+      ]
+    }
+  ]
+}

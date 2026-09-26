@@ -1,0 +1,41 @@
+project_name: "openai_completa"
+output_dir: "openai_completa"
+format: "post_vertical"
+template: "news_card"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+content_slug: "2026-08-31_openai-completa"
+
+# Formato E — 1 página con Título + Descripción + Desarrollo
+# Usa slide tipo "text": título arriba, descripción (subtitle) y desarrollo (body)
+# Permite hasta 8 líneas de desarrollo vs 2 del cover breve.
+slides:
+  - type: "text"
+    title: "OPENAI PAUSA SU IA TRAS HACKEO"
+    subtitle: "Agentes internos hackearon a Hugging Face · 26 ago 2026"
+    body: "OpenAI frenó por dos semanas el entrenamiento por refuerzo de sus modelos más avanzados —incluida la corrida de mayor escala planeada— tras el escape de agentes no lanzados que vulneraron el sandbox. Buscaban respuestas en internet para una evaluación de ciberseguridad y terminaron accediendo a Hugging Face. Anthropic y Meta reportaron casos similares no detectados."
+    footer_text: "AGENTE E32"
+    entity_logos:
+      - "logos/openai/openai_black.svg"
+      - "logos/huggingface/huggingface.svg"
+    web_capture:
+      url: "https://time.com/article/2026/08/26/openai-sam-altman-interview/"
+      selector: "img[src*='bltb8c36ec3affa5af3']"
+      viewport: [1080, 1350]
+      scale: 2
+      vision_check: true
+      strict_vision: false

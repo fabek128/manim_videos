@@ -3,7 +3,10 @@ name: "Agente E32"
 
 brand:
   logo: "logos/agente32/agente32.svg"
-  default_theme: "theme_default"
+  default_theme: "theme_agente32"
+  footer_logos:
+    - "logos/agente32/agente32_paths.svg"
+    - "logos/fabian128k/fabian128k_paths.svg"
 
 social:
   instagram:

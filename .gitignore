@@ -1,6 +1,9 @@
 # Manim output
 media/
 
+# Caché local (screenshots de web_capture, etc.)
+tenants/*/cache/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -8,6 +11,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+.pytest_cache/
 
 # Virtual environment
 .venv/

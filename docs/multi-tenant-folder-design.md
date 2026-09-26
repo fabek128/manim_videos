@@ -39,6 +39,10 @@ redes2/
 ├── .env                         # configuración/proveedores compartidos
 ├── .env.example
 ├── build.py                     # compartido
+├── generators/                  # generadores reutilizables
+│   └── videos/top/
+│       ├── generator.yaml       # descriptor: id, aliases, entrypoint, config_subdir
+│       └── scene.py             # entrypoint mínimo (BaseTopScene)
 ├── scripts/                     # compartido
 │   ├── generate_images.py
 │   ├── generate_videos.py
@@ -46,35 +50,42 @@ redes2/
 │   └── publish_final.py
 ├── src/                         # compartido
 │   └── noticia_carrusel/
+│       ├── tenant.py            # TenantContext + iter_assets
+│       ├── backgrounds.py       # pool combinado tenant→global
+│       └── video_generators/top/ # modelos, loader, composer, style, scene
 ├── templates/                   # compartido
 │   └── prompts/
 ├── skills/                      # compartido
-├── utils/                       # compartido
+├── utils/                       # compartido (themes)
 ├── docs/                        # compartido
-├── assets/                      # assets compartidos
+├── assets/                      # assets compartidos (solo lectura)
+│   ├── backgrounds/             # pool global (opcional)
 │   ├── fonts/
-│   └── logos/                   # logos genéricos/proveedores
+│   ├── logos/                   # logos genéricos/proveedores
+│   └── sounds/
 └── tenants/
     └── agente32/
-        ├── tenant.yaml
-        ├── .env                 # secretos/configuración exclusiva, gitignored
-        ├── .env.example
-        ├── assets/
+        ├── tenant.yaml          # brand.logo, default_theme, footer_logos, handle
+        ├── .env
+        ├── assets/              # exclusivos o que pisan global (misma key)
+        │   ├── backgrounds/
         │   ├── logos/
         │   ├── images/
         │   └── sounds/
         ├── configs/
         │   ├── images/
-        │   └── videos/
-        ├── videos/
-        │   ├── lostops/
-        │   └── ...
-        ├── media/               # trabajo generado por Manim/scripts
-        │   ├── videos/
+        │   └── videos/top/      # JSONs genéricos del top (title/items/audio)
+        ├── videos/              # solo escenas únicas del tenant (intro, logos)
+        ├── overrides/videos/top/ # opcional: TopScene que hereda de BaseTopScene
+        ├── media/               # trabajo generado por Manim/scripts (tenant-aislado)
+        │   ├── videos/top/<slug>/ # output por config
         │   ├── images/
         │   └── posts/
-        └── output/              # imágenes finales aún no publicadas
+        └── output/
 ```
+> Corrección a la decisión inicial: los generadores reutilizables (como `top`) viven
+> fuera de `tenants/`. El tenant aporta configs, assets, outputs y opcionalmente
+> un override pequeño; nunca una copia del generador. Ver `docs/shared-top-generator-refactor-plan.md`.
 
 ### Carpetas compartidas
 

@@ -5,12 +5,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 
+from .backgrounds import select_for_slide
 from .cost_summary import CostEntry, record_image_costs
 from .models import AppConfig, ImageGenerationConfig, SlideConfig
 from .providers import ImageGenerationResult, ImageProviderError, OpenRouterImageProvider
 from .render.canvas import CanvasSpec
 from .render.templates import NewsCardRenderer
 from .tenant import TenantContext
+from .web_capture import api as web_capture_api
+from .web_capture.cache import cached_path as web_capture_cached_path
 
 QUALITY_ALIASES = frozenset({"draft", "low", "medium", "high"})
 
@@ -71,6 +74,39 @@ def intermediate_images(config: AppConfig, tenant: TenantContext) -> list[Path]:
     return existing
 
 
+def _web_capture_path(
+    tenant: TenantContext,
+    slide: SlideConfig,
+    reuse_intermediate: bool,
+) -> tuple[Path, bool]:
+    """Resuelve el fondo `web_capture` de un slide vía `web_capture.api`.
+
+    Cachea en `tenant.cache_dir` por `(url, viewport, scale, selector, ...)`
+    (ver `web_capture/cache.py`) — **no** en `output_dir/intermediate/`:
+    varias configs que capturan la misma URL comparten la misma entrada de
+    caché en vez de una copia por config. `reuse_intermediate=True` reusa
+    un hit existente sin renavegar; `False` (default) siempre recaptura.
+    """
+    cfg = slide.web_capture
+    assert cfg is not None
+    already_cached = reuse_intermediate and web_capture_cached_path(tenant, cfg).is_file()
+    path = web_capture_api.capture_url(
+        url=cfg.url,
+        width=cfg.viewport[0],
+        height=cfg.viewport[1],
+        scale=cfg.scale,
+        selector=cfg.selector,
+        full_page=cfg.full_page,
+        wait_for_selector=cfg.wait_for_selector,
+        wait_for_network_idle=cfg.wait_for_network_idle,
+        delay_ms=cfg.delay_ms,
+        timeout_ms=cfg.timeout_ms,
+        tenant=tenant,
+        force_capture=not reuse_intermediate,
+    )
+    return path, already_cached
+
+
 def _base_image(
     config: AppConfig,
     slide: SlideConfig,
@@ -83,6 +119,13 @@ def _base_image(
     image_config = slide.image_generation or config.image_generation
     source_ref = slide.background_image_path or config.background_image_path
     source = tenant.resolve_asset(source_ref) if source_ref else None
+    if slide.web_capture is not None:
+        # El screenshot se recorta al aspect ratio del post por el pipeline
+        # de render existente (`_background()` -> `load_and_prepare()` ->
+        # `smart_crop`, ver `render/templates.py`): sin costo, sin código
+        # nuevo de cropping acá.
+        path, reused = _web_capture_path(tenant, slide, reuse_intermediate)
+        return path, None, reused
     if image_config.enabled:
         path = _intermediate_path(tenant, output_dir, index)
         if reuse_intermediate and path.is_file():
@@ -103,7 +146,17 @@ def _base_image(
             output_path=path,
         )
         return result.path, result, False
-    return source, None, False
+    if source is not None:
+        return source, None, False
+    if config.background_mode == "pool":
+        # Fallback automático para cualquier post/carrusel que no declare
+        # fondo: se elige un fondo del tenant de forma estable por proyecto,
+        # slide y título. Si la carpeta no existe/vacía, el renderer conserva
+        # su fondo procedural anterior.
+        background = select_for_slide(tenant, config.project_name, index, slide.title)
+        return background, None, False
+    # `background_mode=solid` conserva el fondo procedural del renderer.
+    return None, None, False
 
 
 def _resumen_path(config: AppConfig, tenant: TenantContext, output_dir: Path) -> Path:

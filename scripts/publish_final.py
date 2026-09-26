@@ -106,8 +106,11 @@ def publish(args: argparse.Namespace, tenant: TenantContext) -> list[Path]:
     if not DATE_RE.fullmatch(content_date):
         raise ValueError("--date debe tener formato YYYY-MM-DD")
 
-    # Namespace aislado por tenant.
-    destination = root / "videos" / tenant.manifest.namespace / f"{content_date}_{slug}"
+    # `root` ya incluye el namespace del tenant por defecto
+    # (`Documents/shared/<namespace>`). El tipo decide el subdirectorio;
+    # no repetir el namespace en la ruta final.
+    content_type = "videos" if args.type == "videos" else "images"
+    destination = root / content_type / f"{content_date}_{slug}"
     output_paths = []
     for source in _sources(tenant, args):
         source = source.resolve()

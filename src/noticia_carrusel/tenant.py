@@ -29,7 +29,7 @@ POST_TEMPLATES = frozenset(
 class BrandManifest(BaseModel):
     logo: str
     default_theme: str = "theme_default"
-
+    footer_logos: list[str] | None = None
 
 class InstagramManifest(BaseModel):
     handle: str
@@ -126,12 +126,87 @@ class TenantContext:
         return self.root / "content"
 
     @property
+    def cache_dir(self) -> Path:
+        """Caché local (gitignored) de recursos costosos de regenerar, ej.
+        screenshots de `web_capture` (ver `web_capture/cache.py`)."""
+        return self.root / "cache"
+
+    @property
     def media_videos_dir(self) -> Path:
         return self.media_dir / "videos"
 
     @property
     def env_path(self) -> Path:
         return self.root / ".env"
+
+    def iter_assets(
+        self,
+        relative_dir: str | Path,
+        *,
+        extensions: frozenset[str] | None = None,
+    ) -> tuple[Path, ...]:
+        """Catálogo combinado tenant→global por key lógica.
+
+        Enumera ``assets/<relative_dir>`` global y del tenant, fusionando
+        por path lógico (relativo a ``assets/``). Si la misma key existe
+        en ambas capas, gana el tenant. Orden estable por key.
+        """
+        raw = Path(relative_dir)
+        if raw.is_absolute() or ".." in raw.parts:
+            raise ValueError(f"relative_dir debe ser relativo y sin '..': {relative_dir!r}")
+        # Normalizar extensiones a lower
+        norm_exts: frozenset[str] | None = None
+        if extensions is not None:
+            norm_exts = frozenset(e.lower() for e in extensions)
+
+        catalog: dict[str, Path] = {}
+
+        for root in (self.shared_assets_dir, self.assets_dir):
+            base = (root / raw)
+            # Validar que base permanezca dentro de root (defensa traversal)
+            try:
+                resolved_base = base.resolve()
+                resolved_root = root.resolve()
+            except OSError:
+                continue
+            if not _is_within(resolved_base, resolved_root) and resolved_base != resolved_root:
+                continue
+            if not base.is_dir():
+                continue
+            # Recorrido recursivo: incluye subdirectorios (logos, backgrounds, etc.)
+            for path in base.rglob("*"):
+                if not path.is_file():
+                    continue
+                # Filtro por extensión
+                if norm_exts is not None and path.suffix.lower() not in norm_exts:
+                    continue
+                # Evitar symlinks que escapen
+                try:
+                    resolved = path.resolve()
+                    # Permitir solo si el archivo resuelto sigue dentro de algún
+                    # root autorizado (shared o tenant)
+                    if not (
+                        _is_within(resolved, self.shared_assets_dir.resolve())
+                        or _is_within(resolved, self.assets_dir.resolve())
+                        or resolved == self.shared_assets_dir.resolve()
+                        or resolved == self.assets_dir.resolve()
+                    ):
+                        # También aceptar si está dentro de la base específica
+                        if not _is_within(resolved, resolved_root):
+                            continue
+                except OSError:
+                    continue
+                try:
+                    # Key lógica relativa a assets/
+                    key = str(path.relative_to(root).as_posix())
+                except ValueError:
+                    continue
+                # Inserción: tenant reemplaza global por misma key
+                catalog[key] = path
+
+        # Orden estable por key lógica (alfabético)
+        ordered = sorted(catalog.items(), key=lambda kv: kv[0])
+        return tuple(path for _, path in ordered)
 
     def resolve_inside(self, base: Path, relative: str | Path) -> Path:
         value = Path(relative)
@@ -168,6 +243,9 @@ class TenantContext:
 
     def media_path(self, relative: str | Path) -> Path:
         return self.resolve_inside(self.media_dir, relative)
+
+    def cache_path(self, relative: str | Path) -> Path:
+        return self.resolve_inside(self.cache_dir, relative)
 
     def content_path(self, slug: str, *relative: str | Path) -> Path:
         if not CONTENT_SLUG_RE.fullmatch(slug):

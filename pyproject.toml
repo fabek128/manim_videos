@@ -13,3 +13,11 @@ media_dir = "media"
 # Convención oficial de manim: `from manim import *` en las escenas
 # (ver AGENTS.md). F403/F405 son ruido para este patrón.
 ignore = ["F403", "F405"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "playwright: requiere Chromium instalado (playwright install chromium)",
+    "vision: requiere modelo de visión (OPENROUTER_VISION_MODEL / PROMPTGATE_VISION_MODEL)",
+]

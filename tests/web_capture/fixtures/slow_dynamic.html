@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>slow_dynamic</title>
+  <style>html, body { margin: 0; padding: 0; }</style>
+</head>
+<body>
+  <div id="contenedor"></div>
+  <script>
+    setTimeout(function () {
+      var el = document.createElement("div");
+      el.id = "tardio";
+      el.style.width = "120px";
+      el.style.height = "80px";
+      el.style.background = "#2a9d8f";
+      document.getElementById("contenedor").appendChild(el);
+    }, 300);
+  </script>
+</body>
+</html>

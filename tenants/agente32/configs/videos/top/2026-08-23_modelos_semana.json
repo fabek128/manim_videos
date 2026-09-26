@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "title": [
+    "LOS MODELOS QUE MÁS",
+    "USÉ ESTA SEMANA"
+  ],
+  "subtitle": "Semana del 17 al 23 de agosto",
+  "audio": {
+    "asset": "sounds/intros/fm_attack/FM Attack - Footprints 2.mp3",
+    "gain_db": 15.0
+  },
+  "background_image_path": null,
+  "final_hold_seconds": 5.0,
+  "items": [
+    {
+      "name": "Ox Alpha",
+      "visual_asset": "https://openrouter.ai/images/icons/Stealth.svg",
+      "secondary_text": "OpenRouter",
+      "metric": {
+        "label": "Tokens",
+        "value": "712M"
+      },
+      "comment": [
+        "Gratuito y anónimo",
+        "Análisis y refactorizaciones complejas"
+      ],
+      "specs": [
+        {
+          "label": "Contexto",
+          "value": "1M"
+        },
+        {
+          "label": "Modalidad",
+          "value": "texto+visión"
+        }
+      ]
+    },
+    {
+      "name": "Claude Opus 5",
+      "visual_asset": "anthropic",
+      "secondary_text": "Anthropic",
+      "metric": {
+        "label": "Tokens",
+        "value": "287M"
+      },
+      "comment": [
+        "Planificación y razonamiento profundo",
+        "en funcionalidades complejas"
+      ],
+      "specs": [
+        {
+          "label": "Contexto",
+          "value": "400K"
+        },
+        {
+          "label": "Modalidad",
+          "value": "texto+visión"
+        }
+      ]
+    },
+    {
+      "name": "ChatGPT Luna",
+      "visual_asset": "openai",
+      "secondary_text": "OpenAI",
+      "metric": {
+        "label": "Tokens",
+        "value": "154M"
+      },
+      "comment": [
+        "Modelo versátil, rápido y de costo muy bajo",
+        "Puede ser algo lento, pero cumple."
+      ],
+      "specs": [
+        {
+          "label": "Contexto",
+          "value": "1M"
+        },
+        {
+          "label": "Modalidad",
+          "value": "multimodal"
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek V4 Flash 0731",
+      "visual_asset": "deepseek",
+      "secondary_text": "DeepSeek",
+      "metric": {
+        "label": "Tokens",
+        "value": "61M"
+      },
+      "comment": [
+        "Prototipos rápidos y scripts de bajo costo",
+        "para tareas puntuales"
+      ],
+      "specs": [
+        {
+          "label": "Contexto",
+          "value": "1M"
+        },
+        {
+          "label": "Precio",
+          "value": "N/D"
+        }
+      ]
+    }
+  ]
+}

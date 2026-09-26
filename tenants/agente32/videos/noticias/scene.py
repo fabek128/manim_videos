@@ -1,10 +1,16 @@
-"""Generador de tops "Los más usados" — 100% data-driven desde JSON.
+"""Generador de "Noticias de la semana" — 100% data-driven desde JSON.
 
-Un solo scene.py para todos los tops. Los datos viven en
-`videos/lostops/json/YYYY-MM-DD_<slug>.json` (el nombre ordena por fecha).
-Selección del JSON: variable de entorno TOP_JSON=<ruta>, o si no está
-definida se usa el JSON más reciente de la carpeta (orden por nombre).
-Esquema y ejemplos: videos/lostops/README.md.
+Clon del generador de tops "Los más usados" (`videos/lostops/`) adaptado a
+formato noticias: mismo motor de countdown, mismo layout y coreografía;
+cambian los nombres de campo del JSON y las etiquetas por defecto para
+encajar con "titular / fuente / resumen / datos" en vez de
+"modelo / provider / comentario / specs". Se espera seguir ajustando
+detalles particulares de este formato más adelante.
+
+Los datos viven en `videos/noticias/json/YYYY-MM-DD_<slug>.json` (el nombre
+ordena por fecha). Selección del JSON: variable de entorno TOP_JSON=<ruta>,
+o si no está definida se usa el JSON más reciente de la carpeta (orden por
+nombre). Esquema y ejemplos: videos/noticias/README.md.
 """
 
 import json
@@ -22,7 +28,7 @@ GRIS_TXT = "#B9B9B9"  # gris uniforme para textos secundarios
 ORO = "#FFD700"  # color exclusivo del puesto #1
 
 
-def _cargar_top() -> dict:
+def _cargar_noticias() -> dict:
     """Devuelve el dict del top: TOP_JSON si está, o el JSON más reciente."""
     env = os.environ.get("TOP_JSON")
     if env:
@@ -42,46 +48,40 @@ def _cargar_top() -> dict:
 def _normalizar(top: dict) -> list[tuple]:
     """Convierte el JSON a las tuplas internas de la escena.
 
-    (nombre, logo, etiqueta_métrica, valor_métrica, comentario, specs,
+    (titular, logo, logo_path, etiqueta_dato, valor_dato, resumen, datos,
     destacado). El orden del array define el ranking: [0] es el #1.
     """
-    modelos = []
-    total = len(top["modelos"])
-    for i, m in enumerate(top["modelos"]):
-        specs = [tuple(s) for s in m.get("specs", [])]
-        provider = m.get("provider")
-        if provider and not any(k.lower() == "provider" for k, _ in specs):
-            specs.insert(0, ("Provider", provider))
-        metrica = m.get("metrica", {})
-        if not isinstance(metrica, dict):
-            metrica = {"valor": metrica}
-        modelos.append(
+    noticias = []
+    total = len(top["noticias"])
+    for i, n in enumerate(top["noticias"]):
+        datos = [tuple(d) for d in n.get("datos", [])]
+        fuente = n.get("fuente")
+        if fuente and not any(k.lower() == "fuente" for k, _ in datos):
+            datos.insert(0, ("Fuente", fuente))
+        dato = n.get("dato", {})
+        if not isinstance(dato, dict):
+            dato = {"valor": dato}
+        noticias.append(
             (
-                m["nombre"],
-                m.get("logo", m["nombre"].lower().replace(" ", "_")),
-                m.get("logo_path"),
-                metrica.get("etiqueta", "Tokens"),
-                str(metrica.get("valor", "")),
-                tuple(m.get("comentario", ["", ""])),
-                tuple(specs),
-                bool(m.get("destacado", i == total - 1)),  # #1 por defecto
+                n["titular"],
+                n.get("logo", n["titular"].lower().replace(" ", "_")),
+                n.get("logo_path"),
+                dato.get("etiqueta", "Fecha"),
+                str(dato.get("valor", "")),
+                tuple(n.get("resumen", ["", ""])),
+                tuple(datos),
+                bool(n.get("destacado", i == total - 1)),  # #1 por defecto
             )
         )
-    return modelos
+    return noticias
 
 
-TOP = _cargar_top()
-MODELOS = _normalizar(TOP)
+TOP = _cargar_noticias()
+NOTICIAS = _normalizar(TOP)
 PERIODO = TOP.get("subtitulo", "")
 TITULO_LINEAS: tuple[str, ...] = tuple(
     TOP["titulo"] if isinstance(TOP.get("titulo"), list) else [TOP["titulo"]]
 )
-
-from pathlib import Path
-
-from manim import *
-
-from utils.theme import AGENTE32, ThemedScene
 
 
 # Zonas muertas para la UI de Instagram (Reels/Stories), en píxeles del
@@ -102,14 +102,16 @@ def _texto_par(clave: str, valor: str, fs_clave: int, fs_valor: int) -> VGroup:
     return grupo
 
 
-class ModelosSemana(ThemedScene):
-    """Countdown desde el último puesto hasta el #1 destacado."""
+class NoticiasSemana(ThemedScene):
+    """Countdown desde la noticia menos relevante hasta la #1 destacada."""
 
     theme = AGENTE32
 
     def construct(self):
         # Música de fondo desde t=0. gain=15 porque los tracks del repo
         # tienen master muy bajo (ver skills/global.md §7 "Ganancia").
+        # Placeholder heredado de lostops: cambiar el track cuando este
+        # formato tenga su propia identidad sonora.
         self.add_sound(
             str(SOUNDS_DIR / "intros" / "fm_attack" / "FM Attack - Footprints 2.mp3"),
             gain=15,
@@ -127,30 +129,30 @@ class ModelosSemana(ThemedScene):
         self._titulo_ref: Mobject | None = None
 
         # Orden del video: footer fijo → título → filas en countdown
-        # (último puesto primero, #1 al final) → cierre con top nítido.
+        # (última noticia primero, #1 al final) → cierre con top nítido.
         self._footer()
         self._titulo()
-        n = len(MODELOS)
-        for i, m in enumerate(reversed(MODELOS)):
+        n = len(NOTICIAS)
+        for i, m in enumerate(reversed(NOTICIAS)):
             (
-                nombre,
+                titular,
                 logo_dir,
                 logo_path,
-                met_lbl,
-                met_val,
-                comentario,
-                specs,
+                dato_lbl,
+                dato_val,
+                resumen,
+                datos,
                 destacado,
             ) = m
             self._fila(
                 n - i,
-                nombre,
+                titular,
                 logo_dir,
                 logo_path,
-                met_lbl,
-                met_val,
-                comentario,
-                specs,
+                dato_lbl,
+                dato_val,
+                resumen,
+                datos,
                 destacado,
             )
         # Cierre: top completo nítido, sin difuminación.
@@ -233,18 +235,18 @@ class ModelosSemana(ThemedScene):
     def _fila(
         self,
         puesto: int,
-        nombre: str,
+        titular: str,
         logo_dir: str,
         logo_path: str | None,
-        met_lbl: str,
-        metrica: str,
-        comentario: tuple[str, str],
-        specs: tuple[tuple[str, str], ...],
+        dato_lbl: str,
+        dato: str,
+        resumen: tuple[str, str],
+        datos: tuple[tuple[str, str], ...],
         destacado: bool,
     ) -> None:
         """Fila con doble presentación: tarjeta centrada → slot ranking.
 
-        `metrica` = valor de la métrica ya formateado (ej. "412M");
+        `dato` = valor del dato destacado ya formateado (ej. "28 ago");
         Durante la lectura centrada, el fondo (ranking previo + título)
         queda fuera de foco (opacidad baja, pero siempre visible). Cuando
         la tarjeta vuela a su slot, el fondo vuelve a foco. Al terminar
@@ -258,39 +260,39 @@ class ModelosSemana(ThemedScene):
         pad_h, pad_v = 0.55, 0.55
         chip_c_w = config.frame_width - 0.7  # margen 0.35u por lado
 
-        logo_c = self._logo(nombre, logo_dir, logo_path)
+        logo_c = self._logo(logo_dir, logo_path)
         logo_c.height = min(1.05, logo_c.height)
 
         etiq_c = MarkupText(
             f'<span color="{accent}"><b>#{puesto}</b></span>'
-            f'<span color="{self.theme.accent}">  {nombre}</span>',
+            f'<span color="{self.theme.accent}">  {titular}</span>',
             font="Inter",
             font_size=64 if destacado else 52,
         )
-        com_c = VGroup(
+        res_c = VGroup(
             *[
                 MarkupText(f"<i>{ln}</i>", font="Inter", font_size=30, color=GRIS_TXT)
-                for ln in comentario
+                for ln in resumen
             ]
         ).arrange(DOWN, buff=0.08)
 
-        # Consumo: palabra "Tokens" gris + cifra grande en acento.
-        tok_lbl_c = Text(met_lbl, font="Space Grotesk", font_size=34, color=GRIS_TXT)
-        tok_num_c = Text(
-            metrica,
+        # Dato destacado: etiqueta gris + valor grande en acento.
+        dato_lbl_c = Text(dato_lbl, font="Space Grotesk", font_size=34, color=GRIS_TXT)
+        dato_val_c = Text(
+            dato,
             font="Space Grotesk",
             font_size=64 if destacado else 54,
             color=accent,
         )
-        tokens_c = VGroup(tok_lbl_c, tok_num_c).arrange(RIGHT, buff=0.3)
-        tok_lbl_c.align_to(tok_num_c, DOWN).shift(DOWN * 0.08)
+        dato_c = VGroup(dato_lbl_c, dato_val_c).arrange(RIGHT, buff=0.3)
+        dato_lbl_c.align_to(dato_val_c, DOWN).shift(DOWN * 0.08)
 
-        # Características: columna de pares clave·valor, cada par centrado.
-        specs_c = VGroup(*[_texto_par(k, v, 26, 30) for k, v in specs]).arrange(
+        # Datos adicionales: columna de pares clave·valor, cada par centrado.
+        datos_c = VGroup(*[_texto_par(k, v, 26, 30) for k, v in datos]).arrange(
             DOWN, buff=0.1
         )
 
-        contenido_c = VGroup(logo_c, etiq_c, com_c, tokens_c, specs_c).arrange(
+        contenido_c = VGroup(logo_c, etiq_c, res_c, dato_c, datos_c).arrange(
             DOWN, buff=0.34
         )
         max_w = chip_c_w - 2 * pad_h
@@ -326,7 +328,7 @@ class ModelosSemana(ThemedScene):
         # ======================================================
         # SLOT DEL RANKING (toda la info, alineación perfecta)
         # ======================================================
-        n = len(MODELOS)
+        n = len(NOTICIAS)
         fh = self.camera.frame_height
         fw = config.frame_width
         # Layout adaptativo: vertical → pila de slots; cuadrado/apaisado →
@@ -349,37 +351,37 @@ class ModelosSemana(ThemedScene):
         pad_x, pad_v_s = 0.55, 0.26
         gap_ab = 0.2  # separación entre línea superior e inferior del chip
 
-        # Tokens (se construye primero: su ancho acota al nombre).
-        tok_lbl = Text(met_lbl, font="Space Grotesk", font_size=24, color=GRIS_TXT)
-        tok_num = Text(
-            metrica,
+        # Dato destacado (se construye primero: su ancho acota al titular).
+        dato_lbl_s = Text(dato_lbl, font="Space Grotesk", font_size=24, color=GRIS_TXT)
+        dato_val_s = Text(
+            dato,
             font="Space Grotesk",
             font_size=42 if destacado else 34,
             color=accent,
         )
-        tokens_s = VGroup(tok_lbl, tok_num).arrange(RIGHT, buff=0.2)
-        tok_lbl.align_to(tok_num, DOWN).shift(DOWN * 0.05)
+        dato_s = VGroup(dato_lbl_s, dato_val_s).arrange(RIGHT, buff=0.2)
+        dato_lbl_s.align_to(dato_val_s, DOWN).shift(DOWN * 0.05)
 
-        # Nombre: tamaño ajustado a su cantidad de caracteres (se re-escala
-        # para caber entre el logo y el bloque de tokens).
+        # Titular: tamaño ajustado a su cantidad de caracteres (se re-escala
+        # para caber entre el logo y el bloque de dato).
         etiqueta = MarkupText(
             f'<span color="{accent}"><b>#{puesto}</b></span>'
-            f'<span color="{self.theme.accent}">  {nombre}</span>',
+            f'<span color="{self.theme.accent}">  {titular}</span>',
             font="Inter",
             font_size=48 if destacado else 38,
         )
-        logo = self._logo(nombre, logo_dir, logo_path)
+        logo = self._logo(logo_dir, logo_path)
         logo.width = min(1.5, logo.width)
         logo.height = min(0.8, logo.height)
 
-        # Línea inferior: comentario (2 líneas, izq.) + specs (der.).
-        com_s = VGroup(
+        # Línea inferior: resumen (2 líneas, izq.) + datos (der.).
+        res_s = VGroup(
             *[
                 MarkupText(f"<i>{ln}</i>", font="Inter", font_size=23, color=GRIS_TXT)
-                for ln in comentario
+                for ln in resumen
             ]
         ).arrange(DOWN, buff=0.05)
-        specs_s = VGroup(
+        datos_s = VGroup(
             *[
                 MarkupText(
                     f'<span color="{GRIS_TXT}">{k}</span> '
@@ -387,32 +389,32 @@ class ModelosSemana(ThemedScene):
                     font="Inter",
                     font_size=23,
                 )
-                for k, v in specs
+                for k, v in datos
             ]
         ).arrange(DOWN, buff=0.05, aligned_edge=RIGHT)
         # Presupuesto de ancho: el contenido de cada renglón se escala con
-        # f_w; los gaps del layout (0.45 logo→nombre, 0.5 nombre→tokens,
-        # 0.4 comentario→specs) y el padding del chip son FIJOS (el
+        # f_w; los gaps del layout (0.45 logo→titular, 0.5 titular→dato,
+        # 0.4 resumen→datos) y el padding del chip son FIJOS (el
         # posicionamiento no los escala), así que van fuera de `contenido`.
         fijos = 0.45 + 0.5 + 0.4 + 2 * pad_x
         contenido = max(
-            logo.width + etiqueta.width + tokens_s.width,
-            com_s.width + specs_s.width,
+            logo.width + etiqueta.width + dato_s.width,
+            res_s.width + datos_s.width,
         )
         f_w = min(1.0, (chip_w - fijos) / contenido)
         if f_w < 1.0:
-            for mo in (logo, etiqueta, tokens_s, com_s, specs_s):
+            for mo in (logo, etiqueta, dato_s, res_s, datos_s):
                 mo.scale(f_w)
 
         # Alturas y fit de alto: filas*chip + padding entre título y footer
         # debe entrar en el alto disponible; si no, se escala el contenido.
-        alto_a = max(logo.height, etiqueta.height, tokens_s.height)
-        alto_b = max(com_s.height, specs_s.height)
+        alto_a = max(logo.height, etiqueta.height, dato_s.height)
+        alto_b = max(res_s.height, datos_s.height)
         chip_h = alto_a + gap_ab + alto_b + 2 * pad_v_s
         disp_h = techo - piso - (filas + 1) * slot_pad
         f_h = min(1.0, disp_h / (filas * chip_h))
         if f_h < 1.0:
-            for mo in (logo, etiqueta, tokens_s, com_s, specs_s):
+            for mo in (logo, etiqueta, dato_s, res_s, datos_s):
                 mo.scale(f_h)
             chip_h *= f_h
             alto_a *= f_h
@@ -440,12 +442,12 @@ class ModelosSemana(ThemedScene):
         logo.move_to([chip.get_left()[0] + pad_x + logo.width / 2, y_a, 0])
         etiqueta.next_to(logo, RIGHT, buff=0.45)
         etiqueta.set_y(y_a)
-        tokens_s.move_to([chip.get_right()[0] - pad_x - tokens_s.width / 2, y_a, 0])
+        dato_s.move_to([chip.get_right()[0] - pad_x - dato_s.width / 2, y_a, 0])
 
-        com_s.move_to([chip.get_left()[0] + pad_x + com_s.width / 2, y_b, 0])
-        specs_s.move_to([chip.get_right()[0] - pad_x - specs_s.width / 2, y_b, 0])
+        res_s.move_to([chip.get_left()[0] + pad_x + res_s.width / 2, y_b, 0])
+        datos_s.move_to([chip.get_right()[0] - pad_x - datos_s.width / 2, y_b, 0])
 
-        slot = VGroup(chip, logo, etiqueta, tokens_s, com_s, specs_s)
+        slot = VGroup(chip, logo, etiqueta, dato_s, res_s, datos_s)
         # --- COREOGRAFÍA POR FILA ---
         # 1) El fondo (ranking ya colocado + título) pasa a fuera de foco:
         #    opacidad baja pero NUNCA desaparece (sigue visible, borroso).
@@ -493,7 +495,7 @@ class ModelosSemana(ThemedScene):
         self._chequear_zonas("footer", grupo)
         self.add(grupo)
 
-    def _logo(self, nombre: str, logo_dir: str, logo_path: str | None) -> Mobject:
+    def _logo(self, logo_dir: str, logo_path: str | None) -> Mobject:
         """Logo SVG por asset (logo_dir) o path explícito (logo_path JSON)."""
         if logo_path:
             svg_path = Path(logo_path)
@@ -506,8 +508,8 @@ class ModelosSemana(ThemedScene):
                 return SVGMobject(str(svg_path))
             except Exception as exc:  # noqa: BLE001
                 print(f"[warn] SVG {svg_path} falló ({exc}); uso monograma")
-        # Sin SVG disponible: monograma = inicial de la MARCA (logo_dir) en
-        # Inter sobre chip 0.85u. Evita colisiones tipo GPT→"G" (Gemini).
+        # Sin SVG disponible: monograma = inicial de la FUENTE (logo_dir) en
+        # Inter sobre chip 0.85u.
         mono = Text(
             logo_dir[0].upper(), font="Inter", font_size=40, color=self.theme.primary
         )

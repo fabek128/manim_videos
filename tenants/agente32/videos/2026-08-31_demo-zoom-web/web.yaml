@@ -1,0 +1,33 @@
+# Video "engine=web": sin scene.py, sin Manim. Ver docs/web-capture.md y
+# docs/web-capture-plan.md (Fase E) para la arquitectura completa.
+#
+# docs.python.org/3.12/ se eligió por ser documentación pública VERSIONADA
+# (estable entre corridas, no depende de contenido dinámico) — mismo motivo
+# que el ejemplo de post en configs/images/post_web_capture.yaml.
+#
+# `capture.viewport`/`fps` de acá son solo el default para invocar el módulo
+# directamente fuera de build.py; al renderizar vía `build.py --video`, el
+# viewport y el fps de captura siguen al formato/calidad pedidos por el
+# comando (igual que -r/--fps para una escena Manim).
+capture:
+  url: "https://docs.python.org/3.12/"
+  scale: 2
+
+duration: 4.0
+fps: 30
+
+# Pan + zoom manual (en vez de zoom_to) para cubrir también este modo de
+# WebSceneConfig: arranca centrado arriba, termina desplazado a la izquierda
+# y con zoom 1.8x.
+camera:
+  keyframes:
+    - time: 0.0
+      x: 0.5
+      y: 0.15
+      zoom: 1.0
+      easing: "ease_in_out"
+    - time: 4.0
+      x: 0.3
+      y: 0.35
+      zoom: 1.8
+      easing: "ease_in_out"

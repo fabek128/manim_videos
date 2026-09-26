@@ -27,12 +27,17 @@ tenant en `tenants/`. Todo lo que sigue opera dentro de
 | Script | Para qué |
 |---|---|
 | `scripts/new_content.py` | Crear el andamiaje de un tema: `brief.md`, `caption.md`, `assets/` |
+| `scripts/generate_news.py` | Investigar/generar noticias por niveles 1 (URL), 2 (búsqueda) y 3 (profundo), con informe, opciones, piezas, `post.txt` y Vision QA |
+| `scripts/generate_backgrounds.py` | Generar fondos reutilizables sin texto ni logos en `tenants/<id>/assets/backgrounds/`, con costo y Vision QA |
 | `scripts/generate_caption.py` | Redactar el caption desde `brief.md` con un template de `templates/posts/` |
-| `scripts/generate_images.py` | Renderizar placa o carrusel desde un YAML |
+| `scripts/generate_images.py` | Renderizar placa o carrusel desde un YAML; usa el pool de backgrounds si no hay fondo explícito |
 | `scripts/fetch_logo.py` | Descargar y registrar un logo con origen documentado |
 | `scripts/content_status.py` | Ver el estado de todos los proyectos de contenido del tenant |
 | `scripts/publish_final.py` | Publicar a la carpeta compartida (solo con aprobación explícita) |
-
+Niveles de `generate_news.py`: `1` analiza una URL; `2` busca hasta 3
+fuentes y entrega opciones; `3` contrasta hasta 6 fuentes y entrega un
+informe profundo. Los niveles 2/3 no generan una pieza hasta que se elige
+`--select`.
 ## 4. Flujo para un tema nuevo
 
 ```bash
@@ -141,16 +146,15 @@ python scripts/generate_images.py post --config <archivo>.yaml --reuse-intermedi
 
 - Nunca inventar métricas, fechas, precios, nombres ni capacidades.
 - Todo hecho en el brief necesita fuente con fecha.
-- `estado: confirmado` en el brief exige 2+ fuentes primarias
-  (`src/noticia_carrusel/brief.py` lo valida).
-- Dato faltante: `N/D`. Nunca un valor estimado.
-- Marcar `[SIN CONFIRMAR]` lo que no tenga sustento y avisarlo.
-
 ## 11. Verificación visual
 
-Antes de mostrar un PNG al usuario: revisar que el texto no se corte,
-que el contraste sea suficiente, que el branding esté presente y que
-las zonas seguras de Instagram se respeten (`docs/instagram-formats.md`).
+Antes de mostrar un PNG al usuario: el rol de visión debe revisar texto sin
+cortes, contraste, branding, logos verdaderos, zonas seguras y que el texto
+no cubra caras, ojos, pantallas, gráficos u objetos focales. Si falla,
+regenerar/corregir hasta 3 veces; en la 4.ª evaluación fallida, detenerse,
+guardar `vision_review.json` e informar el motivo. No entregar silenciosamente
+una pieza no validada. Las reglas completas de niveles y gates están en
+`AGENTS.md` §3b-3c y `docs/news-generator.md`.
 
 ## 12. Publicación
 

@@ -1,0 +1,52 @@
+project_name: "openai_astra_carousel"
+output_dir: "openai_astra_carousel"
+format: "carousel_vertical"
+template: "news_carousel"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+content_slug: "2026-09-02_openai-astra"
+
+# El slide_01 usa un fondo generado específicamente para Astra, sin logo
+# superpuesto. Los slides informativos siguientes mantienen fondo de marca.
+slides:
+  - type: "cover"
+    title: "ASTRA: NIVEL CRÍTICO"
+    highlights: ["ASTRA", "NIVEL CRÍTICO"]
+    subtitle: "Ciberseguridad avanzada · acceso limitado"
+    footer_text: "AGENTE E32"
+    # No se usa logo en slide_01 por decisión editorial. El fondo es una
+    # imagen generada específicamente para Astra/ciberseguridad.
+    background_image_path: "backgrounds/bg_11_astra-cybersecurity.png"
+  - type: "text"
+    title: "QUÉ AFIRMA OPENAI"
+    body: "OpenAI dice que Astra puede encontrar vulnerabilidades desconocidas y desarrollar cadenas de explotación en sistemas protegidos sin instrucciones paso a paso, con las herramientas y permisos adecuados."
+    footer_text: "AGENTE E32"
+  - type: "bullets"
+    title: "DATOS DE LA EVALUACIÓN"
+    bullets:
+      - "100% en ExploitBench sobre fallas conocidas"
+      - "Detectó dos zero-day en una prueba interna"
+      - "Acceso avanzado limitado a testers"
+    footer_text: "AGENTE E32"
+  - type: "text"
+    title: "POR QUÉ IMPORTA"
+    body: "Astra cambia el debate: ya no se trata solo de aumentar capacidades, sino de controlar un modelo capaz de encontrar fallas nuevas y actuar sobre ellas. OpenAI suma monitoreo, límites de acceso y controles contra abuso."
+    footer_text: "AGENTE E32"
+  - type: "text"
+    title: "QUÉ FALTA CONFIRMAR"
+    body: "OpenAI todavía no publicó la fecha exacta de lanzamiento ni el System Card. Los resultados de los benchmarks y los dos zero-day aún no tienen validación independiente publicada. Astra no participó en el incidente de Hugging Face."
+    footer_text: "AGENTE E32"

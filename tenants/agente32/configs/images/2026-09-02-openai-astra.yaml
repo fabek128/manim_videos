@@ -1,0 +1,65 @@
+project_name: 2026-09-02-openai-astra
+output_dir: 2026-09-02-openai-astra
+format: carousel_vertical
+template: news_carousel
+content_slug: 2026-09-02_openai-astra
+brand:
+  name: Agente E32
+  logo_path: logos/agente32/agente32.svg
+fonts:
+  title: fonts/Montserrat-ExtraBold.ttf
+  body: fonts/Inter-SemiBold.ttf
+colors:
+  text_primary: '#FFFFFF'
+  text_secondary: '#D9D9D9'
+  highlight_bg: '#0057D9'
+  footer_text: '#FFFFFF'
+  divider: '#6F86A8'
+slides:
+- type: cover
+  title: 'PATH TO ASTRA: CRITICAL CAPABILITIES AND FRONTIER SAFEGUARDS | OPENAI'
+  highlights:
+  - Path
+  subtitle: 'Path to Astra: critical capabilities and frontier safeguards | OpenAI
+    OpenAI September 1, 2026 Safety Security Path to Astra: critical capabilities
+    and frontier safeguards Loading…'
+  body: ''
+  footer_text: Agente E32
+  entity_logos:
+  - logos/openai/openai_black.svg
+  web_capture:
+    url: https://openai.com/index/path-to-astra/
+    viewport:
+    - 1080
+    - 1350
+    scale: 2
+    vision_check: true
+    strict_vision: false
+- type: text
+  title: QUÉ PASÓ
+  body: 'Path to Astra: critical capabilities and frontier safeguards | OpenAI OpenAI
+    September 1, 2026 Safety Security Path to Astra: critical capabilities and frontier
+    safeguards Loading… Share Since our earlier assessment that Astra might reach
+    a critical level of cybersecurity capability, we have gathered more evidence and
+    run additional evaluations to assess the model’s capabilities. We now believe
+    Astra meets the Critical cybersecurity capability threshold under our Preparedness
+    Framework , meaning'
+  footer_text: Agente E32
+- type: bullets
+  title: PUNTOS CLAVE
+  bullets:
+  - 'Path to Astra: critical capabilities and frontier safeguards | OpenAI OpenAI
+    September 1, 2026 Safety Security Path to Astra: critical capabilities and frontier
+    safeguards Loading…'
+  - N/D — requiere análisis editorial adicional.
+  - 'Estado: en_curso'
+  footer_text: Agente E32
+- type: text
+  title: POR QUÉ IMPORTA
+  body: N/D — requiere análisis editorial adicional.
+  footer_text: Agente E32
+- type: text
+  title: QUÉ SIGUE
+  body: La información sigue en seguimiento. Revisar nuevas confirmaciones antes de
+    publicar.
+  footer_text: Agente E32

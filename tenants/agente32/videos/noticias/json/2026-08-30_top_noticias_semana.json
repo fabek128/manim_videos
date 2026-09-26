@@ -1,0 +1,102 @@
+{
+    "titulo": [
+        "LAS NOTICIAS QUE MÁS",
+        "IMPORTARON ESTA SEMANA"
+    ],
+    "subtitulo": "Semana del 24 al 30 de agosto",
+    "noticias": [
+        {
+            "titular": "Nuevo modelo open-weight compite con los frontier",
+            "logo": "deepseek",
+            "fuente": "DeepSeek",
+            "dato": {
+                "etiqueta": "Fecha",
+                "valor": "26 ago"
+            },
+            "resumen": [
+                "Licencia permisiva y contexto de 1M tokens",
+                "Ya disponible para descarga y fine-tuning"
+            ],
+            "datos": [
+                [
+                    "Categoría",
+                    "Modelos"
+                ],
+                [
+                    "Alcance",
+                    "[SIN CONFIRMAR]"
+                ]
+            ]
+        },
+        {
+            "titular": "Actualización de Gemini suma ventana de contexto extendida",
+            "logo": "google",
+            "fuente": "Google",
+            "dato": {
+                "etiqueta": "Fecha",
+                "valor": "27 ago"
+            },
+            "resumen": [
+                "Apunta a tareas de análisis de documentos largos",
+                "Rollout gradual por región"
+            ],
+            "datos": [
+                [
+                    "Categoría",
+                    "Producto"
+                ],
+                [
+                    "Región",
+                    "[SIN CONFIRMAR]"
+                ]
+            ]
+        },
+        {
+            "titular": "OpenAI anuncia cambios en límites de uso de la API",
+            "logo": "openai",
+            "fuente": "OpenAI",
+            "dato": {
+                "etiqueta": "Fecha",
+                "valor": "29 ago"
+            },
+            "resumen": [
+                "Nuevos tiers para cuentas de desarrollador",
+                "Vigencia desde el próximo ciclo de facturación"
+            ],
+            "datos": [
+                [
+                    "Categoría",
+                    "Plataforma"
+                ],
+                [
+                    "Impacto",
+                    "[SIN CONFIRMAR]"
+                ]
+            ]
+        },
+        {
+            "titular": "Anthropic presenta mejoras de razonamiento en Claude",
+            "logo": "anthropic",
+            "fuente": "Anthropic",
+            "dato": {
+                "etiqueta": "Fecha",
+                "valor": "30 ago"
+            },
+            "resumen": [
+                "Foco en tareas de planificación multi-paso",
+                "Benchmarks propios, pendientes de validación externa"
+            ],
+            "datos": [
+                [
+                    "Categoría",
+                    "Modelos"
+                ],
+                [
+                    "Benchmark",
+                    "según Anthropic"
+                ]
+            ],
+            "destacado": true
+        }
+    ]
+}

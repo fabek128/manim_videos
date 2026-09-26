@@ -1,0 +1,36 @@
+project_name: "web_capture_demo_vertical"
+output_dir: "web_capture_demo_vertical"
+format: "post_vertical"
+template: "news_card"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+  footer_text: "#FFFFFF"
+  divider: "#6F86A8"
+
+# Fondo capturado en vivo de una URL (Playwright) en vez de generado por IA
+# o un asset estático — ver docs/web-capture.md. docs.python.org/3.12/ se
+# eligió a propósito por ser documentación VERSIONADA (no cambia de diseño
+# entre corridas y no desaparece), para que este ejemplo sea reproducible
+# sin depender de un sitio que pueda romper el layout.
+slides:
+  - type: "cover"
+    title: "CAPTURA WEB COMO FONDO DE UN POST"
+    highlights: ["WEB CAPTURE", "PLAYWRIGHT + OPENCV"]
+    subtitle: "Ejemplo de integración — ver docs/web-capture.md"
+    footer_text: "AGENTE E32"
+    web_capture:
+      url: "https://docs.python.org/3.12/"
+      viewport: [1080, 1350]
+      scale: 2
+      full_page: false

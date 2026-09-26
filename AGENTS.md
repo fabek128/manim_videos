@@ -53,14 +53,91 @@ Ante *"escribí algo sobre X"*, en este orden y sin saltear pasos:
 4. **Preguntar formato y piezas**, todo junto, con default recomendado.
 5. **Resolver assets**: logos por prioridad tenant → compartido; si
    falta, descargar del press kit oficial y documentar el origen.
+   **Para prototipos de noticias, usar siempre logos verdaderos** de las
+   marcas/entidades mencionadas (OpenAI, Hugging Face, etc.): nunca
+   placeholders, monogramas tipográficos ni logos generados por IA. Si el
+   logo no existe en `assets/logos/`, descargarlo del press kit oficial
+   **antes** de generar el prototipo visual.
 6. **Prototipo visual**: antes de generar, chequear si ya hay imágenes
    base en `intermediate/` y preguntar al usuario si regenerar o
    verlas primero (ver §8). Reportar paths absolutos y, si usó IA, el
    costo (ver §7).
+   **Chequeo de visión**: toda imagen capturada vía `web_capture` (screenshot)
+   pasa por el rol de visión que analiza si hay publicidad, banners, popups u
+   otros artefactos. Si no pasa la validación, se regenera automáticamente;
+   el loop permite **hasta 3 reintentos** y a la 4ta evaluación —si sigue sin
+   pasar— se detiene y se informa al usuario que la imagen no pasó el review
+   tras 3 intentos.
 7. **Iterar** con el usuario las veces que haga falta.
 8. **Final** en calidad alta. Reportar el costo de esta corrida y el
    acumulado del proyecto (ver §7).
 9. **Publicar solo con aprobación explícita.**
+### 3b. Niveles de trabajo del generador de noticias
+
+El script `scripts/generate_news.py` tiene tres niveles explícitos. No
+confundirlos: cada nivel tiene un costo, una profundidad de investigación
+y una salida distinta.
+
+| Nivel | Entrada | Investigación | Salida |
+|---|---|---|---|
+| `1` — Fuente única | `--url <URL>` | Lee y analiza solo esa página | `brief.md`, informe corto, screenshot validado, una pieza mínima y `post.txt` |
+| `2` — Búsqueda | `--topic "<tema>"` | Busca noticias relacionadas, lee hasta 3 fuentes y separa confirmados/no confirmados | informe con opciones de ángulo; después de elegir, piezas + `post.txt` |
+| `3` — Investigación profunda | `--topic "<tema>"` | Busca hasta 8 resultados, contrasta hasta 6 fuentes, arma cronología, contradicciones y datos faltantes | informe profundo con opciones; después de elegir, piezas, assets y `post.txt` |
+
+Uso:
+
+```bash
+# Nivel 1: URL directa, análisis mínimo y pieza breve
+python scripts/generate_news.py --level 1 \
+  --url "https://ejemplo.com/noticia" --format short
+
+# Nivel 2: devuelve informe y opciones; --select genera la opción elegida
+python scripts/generate_news.py --level 2 \
+  --topic "nuevo modelo de IA de OpenAI"
+python scripts/generate_news.py --level 2 \
+  --topic "nuevo modelo de IA de OpenAI" --select 1 --format carousel3
+
+# Nivel 3: investigación ampliada, contradicciones y cronología
+python scripts/generate_news.py --level 3 \
+  --topic "nuevo modelo de IA de OpenAI" --select 2 --format carousel5
+```
+
+Si faltan `--select`, `--format` o `--visual` y el proceso tiene terminal
+interactiva, el script pregunta en lote qué ángulo, formato y tipo de fondo
+usar (`screenshot` o `solid`). Sin terminal interactiva, imprime las opciones
+y termina sin generar piezas: el agente debe devolver el informe al usuario y
+esperar su elección.
+
+### 3c. Gate visual obligatorio antes de entregar
+
+El rol de visión debe ejecutarse en **cada etapa visual previa a la
+entrega**:
+
+1. screenshot crudo capturado por `web_capture`;
+2. cada PNG final de post/story/carrusel después de componer texto,
+   logos y fondo;
+3. frames representativos de un video web, si el nivel genera video.
+
+Debe validar publicidad, popups, cookies, paywalls, 404/captcha,
+artefactos de carga, texto cortado, contraste, zonas seguras, logos
+verdaderos y texto que tape ojos, boca, caras, pantallas, gráficos,
+código, logos u objetos focales. Texto sobre torso o fondo oscuro sin
+ocultar el objeto focal no es un error.
+
+Si el resultado no pasa:
+
+- regenerar o corregir la composición;
+- permitir como máximo **3 reintentos**;
+- la 4.ª evaluación es el último review: si falla, detenerse, conservar
+  el diagnóstico y reportar al usuario que no pasó después de 3 intentos;
+- nunca entregar ni publicar silenciosamente una imagen fallida;
+- la visión sobre texto/reportes no reemplaza la revisión editorial de
+  hechos: son gates separados.
+
+El estado del gate debe quedar en `vision_review.json` junto al proyecto,
+con `attempts`, `clean`, `issues`, `confidence` y `status`
+(`passed`/`stopped_after_3_retries`). No publicar sin aprobación explícita.
+
 
 ### 4. Reglas de interacción
 
@@ -167,19 +244,33 @@ python -c "import manim; print(manim.__version__)"
 
 ## Estructura del proyecto
 
-videos/
-  YYYY-MM-DD_tema/      # Cada video en su carpeta con fecha
-    scene.py             # Escenas (clases que heredan de Scene)
-assets/                  # Recursos compartidos (logos, gráficos, audio)
-  logos/<nombre>/        # Un logo por carpeta: fuente SVG + versión paths + README
-  sounds/<categoría>/    # Música y SFX para los videos (ej. intros/)
-media/                   # Output renderizado (gitignored)
-utils/                   # Utilidades compartidas (themes, helpers)
-docs/                    # Documentación del proyecto
-build.py                 # Script de compilación
-skills/                  # Prompts/instrucciones para generar tipos de video
-templates/                # Prompts de diseño que funcionan como guías reutilizables
-
+```text
+generators/videos/top/       # Generador global reutilizable (top/lostops) — código común
+  generator.yaml             # descriptor: id, aliases, entrypoint, config_subdir
+  scene.py                   # entrypoint Manim mínimo (delega a BaseTopScene)
+src/noticia_carrusel/video_generators/top/  # Lógica común: modelos, loader, composer, style
+assets/                      # Recursos compartidos (solo lectura)
+  backgrounds/               # Fondos reutilizables para posts y videos (pool combinado)
+  fonts/
+  logos/<nombre>/            # Un logo por carpeta: fuente SVG + versión paths + README
+  sounds/<categoría>/        # Música y SFX para los videos (ej. intros/)
+tenants/<id>/                # Todo lo propio de la marca/tenant
+  tenant.yaml
+  assets/                    # Exclusivos o que pisan a global (misma key lógica)
+    backgrounds/
+    logos/
+    sounds/
+  configs/videos/top/        # JSONs genéricos del top (title, subtitle, items, audio)
+  videos/                    # Solo escenas únicas del tenant (intro, logos). Los generadores comunes NO van aquí
+  overrides/videos/top/      # Opcional: TopScene que hereda de BaseTopScene y reemplaza style/renderer
+  media/videos/top/<slug>/   # Output renderizado tenant-aislado
+utils/                       # Utilidades compartidas (themes, helpers)
+docs/
+build.py
+skills/
+templates/
+```
+> Regla: los generadores reutilizables viven fuera de `tenants/`. El tenant aporta configs, assets, outputs y opcionalmente un override pequeño; nunca una copia del generador global. Ver `docs/shared-top-generator-refactor-plan.md` y `docs/multi-tenant-folder-design.md`.
 ## Convenciones
 
 - **Fuentes**: la especificación completa vive en `docs/fonts.md`. Resumen:
@@ -191,19 +282,34 @@ templates/                # Prompts de diseño que funcionan como guías reutili
 - **Archivos**: `scene.py` o nombre descriptivo si hay múltiples
 - **Clases**: PascalCase, heredan de `Scene` o subclases (e.g., `MovingCameraScene`)
 - **Imports**: `from manim import *` (convención estándar de Manim)
-- **Output**: todo va a `media/`, está gitignored
 - **Assets**: logos en `assets/logos/<nombre>/` con README que documente cómo
-  regenerar la versión paths (ver `assets/logos/agente32/README.md`)
-  - Manim no soporta `<text>` en SVG: convertir a curvas con Inkscape
-    (`--export-text-to-path`) y forzar `stroke:none` (strokes residuales gigantes)
+  regenerar la versión paths (ver `assets/logos/agente32/README.md`).
+  Los backgrounds reutilizables viven en `assets/backgrounds/` (global) y
+  `tenants/<id>/assets/backgrounds/` (tenant). El catálogo se fusiona con
+  prioridad tenant por key lógica (`TenantContext.iter_assets` + `available_backgrounds`);
+  un fondo explícito (`background_image_path`) siempre gana al pool. Usar
+  `background_mode: "solid"` solo cuando se solicite explícitamente conservar
+  el fondo procedural.
+- **Manim** no soporta `<text>` en SVG: convertir a curvas con Inkscape
+  (`--export-text-to-path`) y forzar `stroke:none` (strokes residuales gigantes)
 - **Análisis de JSON de tops**: cuando el usuario pida analizar uno o más JSON,
   leer siempre los archivos reales antes de opinar. Revisar estructura, tipos,
   campos obligatorios, valores faltantes o inválidos, orden del ranking,
-  referencias a logos/assets y URLs SVG. Revisar también todos los textos
-  visibles (`titulo`, `subtitulo`, `comentario` y etiquetas de `specs`) y
-  proponer/aplicar una redacción más clara, correcta y consistente.
-  Nunca inventar métricas, nombres, precios ni otros hechos: conservar los datos
-  factuales y señalar cualquier dato que requiera confirmación.
+  referencias a logos/assets y URLs SVG. El esquema actual es genérico:
+  `title`/`subtitle`/`audio`/`background_image_path`/`final_hold_seconds`/`items[]`
+  (`name`/`visual_asset`/`secondary_text`/`metric`/`comment`/`specs[]`/`highlighted`);
+  el esquema viejo (`titulo`/`modelos`/`provider`/`metrica`) vive solo en
+  `tenants/<id>/videos/lostops/json` migrado a `configs/videos/top`. Revisar
+  también todos los textos visibles y proponer redacción más clara sin inventar
+  métricas, nombres, precios ni otros hechos.
+- **Temas**: usar `ThemedScene` de `utils/theme.py`; paletas definidas ahí mismo.
+  El generador global resuelve el theme por `brand.default_theme` del manifest
+  y el footer por `brand.footer_logos` (usa `TenantContext.resolve_asset`);
+  no hardcodear `agente32`/`fabian128k` en código común.
+- **Audio**: música en `assets/sounds/<categoría>/` o `tenants/<id>/assets/sounds/`.
+  El generador top resuelve el asset vía `TenantContext.resolve_asset` y el
+  builder inyecta `VIDEO_CONFIG`/`RENDER_SEED`; nunca usar
+  `Path(__file__).parents[2] / "assets"` dentro de generadores comunes.
 - **Skills y protocolo (carga obligatoria)**: al iniciar CUALQUIER tarea de
   este repo, leer siempre `skills/global.md` antes de escribir código. Si la
   tarea es de contenido para redes (placa, carrusel, story, caption, o
@@ -215,12 +321,6 @@ templates/                # Prompts de diseño que funcionan como guías reutili
   usuario lo pida: las skills se levantan solas. Las skills son
   instrucciones autocontenidas: parámetros a pedir, estructura, assets y
   checklist.
-- **Temas**: usar `ThemedScene` de `utils/theme.py`; paletas definidas ahí mismo
-- **Audio**: música en `assets/sounds/<categoría>/` (actualmente
-  `sounds/intros/` con 2 tracks: "FM Attack - Footprints"). Usar con
-  `self.add_sound(ruta, gain=...)` dentro de `construct()`; el audio queda
-  sincronizado en el render final. Rutas absolutas al asset:
-  `Path(__file__).parents[2] / "assets" / "sounds" / ...`
 
 ## Formatos de salida (Instagram)
 

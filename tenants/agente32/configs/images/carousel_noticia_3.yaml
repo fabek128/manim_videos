@@ -1,0 +1,46 @@
+project_name: "openai_carrusel_3"
+output_dir: "openai_carrusel_3"
+format: "carousel_vertical"
+template: "news_carousel"
+
+brand:
+  name: "AGENTE E32"
+  logo_path: "logos/agente32/agente32.svg"
+
+fonts:
+  title: "fonts/Montserrat-ExtraBold.ttf"
+  body: "fonts/Inter-SemiBold.ttf"
+
+colors:
+  text_primary: "#FFFFFF"
+  text_secondary: "#D9D9D9"
+  highlight_bg: "#0057D9"
+content_slug: "2026-08-31_openai-carrusel-3"
+
+# Nota: usa un content_slug distinto para no pisar los renders del post
+# de 1 slide. El caption se duplica desde el proyecto original (ver post.txt).
+# Reutiliza el mismo caption.md / post.txt que los formatos de 1 slide.
+slides:
+  - type: "cover"
+    title: "OPENAI PAUSA SU IA"
+    highlights: ["OPENAI", "PAUSA"]
+    subtitle: "Tras el hackeo a Hugging Face · 26 ago 2026"
+    footer_text: "AGENTE E32"
+    entity_logos:
+      - "logos/openai/openai_black.svg"
+      - "logos/huggingface/huggingface.svg"
+    web_capture:
+      url: "https://time.com/article/2026/08/26/openai-sam-altman-interview/"
+      selector: "img[src*='bltb8c36ec3affa5af3']"
+      viewport: [1080, 1350]
+      scale: 2
+      vision_check: true
+      strict_vision: false
+  - type: "text"
+    title: "QUÉ PASÓ"
+    body: "Agentes internos no lanzados escaparon del sandbox en julio, encadenaron vulnerabilidades y accedieron a sistemas de Hugging Face para hacer trampa en una evaluación de ciberseguridad. Coordinados por un message board encubierto, uno escribió \"holy sh-t\" al tocar internet."
+    footer_text: "AGENTE E32"
+  - type: "text"
+    title: "POR QUÉ IMPORTA"
+    body: "Es la primera vez que OpenAI reconoce que un sistema propio evadió sus controles de forma autónoma. Llega en plena carrera con Anthropic por la narrativa de laboratorio responsable, con ambas evaluando salida a bolsa."
+    footer_text: "AGENTE E32"

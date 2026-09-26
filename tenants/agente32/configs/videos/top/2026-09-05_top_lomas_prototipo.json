@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "title": [
+    "TOP LOMAS",
+    "VERSIÓN DE PRUEBA"
+  ],
+  "subtitle": "PROTOTIPO · DATOS FICTICIOS",
+  "audio": {
+    "asset": "sounds/intros/SunsetDrift.mp3",
+    "gain_db": -4.0
+  },
+  "background_image_path": "backgrounds/bg_01_neural-network.png",
+  "final_hold_seconds": 5.0,
+  "items": [
+    {
+      "name": "ChatGPT Luna",
+      "visual_asset": "openai",
+      "secondary_text": "OpenAI",
+      "metric": {
+        "label": "Tokens",
+        "value": "890M"
+      },
+      "comment": [
+        "El modelo se sitúa en la primera posición del ranking de prueba.",
+        "La puntuación mostrada es un valor simulado."
+      ],
+      "specs": [
+        {
+          "label": "Puesto",
+          "value": "#1"
+        },
+        {
+          "label": "Estado",
+          "value": "Simulado"
+        }
+      ]
+    },
+    {
+      "name": "Hy4 Preview",
+      "visual_asset": "tencent",
+      "secondary_text": "Tencent",
+      "metric": {
+        "label": "Tokens",
+        "value": "520M"
+      },
+      "comment": [
+        "En la segunda posición del ranking de prueba aparece otro modelo.",
+        "La cifra asociada es únicamente ilustrativa."
+      ],
+      "specs": [
+        {
+          "label": "Puesto",
+          "value": "#2"
+        },
+        {
+          "label": "Estado",
+          "value": "Simulado"
+        }
+      ]
+    },
+    {
+      "name": "GLM 5.3 Flash",
+      "visual_asset": "zai",
+      "secondary_text": "Z.ai",
+      "metric": {
+        "label": "Tokens",
+        "value": "410M"
+      },
+      "comment": [
+        "El tercer puesto del ranking de prueba es ocupado por otro modelo.",
+        "El número presentado no refleja datos reales."
+      ],
+      "specs": [
+        {
+          "label": "Puesto",
+          "value": "#3"
+        },
+        {
+          "label": "Estado",
+          "value": "Simulado"
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek V4 Flash 0731",
+      "visual_asset": "deepseek",
+      "secondary_text": "DeepSeek",
+      "metric": {
+        "label": "Tokens",
+        "value": "340M"
+      },
+      "comment": [
+        "La cuarta posición del ranking de prueba corresponde a otro modelo.",
+        "La métrica indicada es solo una simulación."
+      ],
+      "specs": [
+        {
+          "label": "Puesto",
+          "value": "#4"
+        },
+        {
+          "label": "Estado",
+          "value": "Simulado"
+        }
+      ]
+    },
+    {
+      "name": "MiniMax M3",
+      "visual_asset": "minimax",
+      "secondary_text": "MiniMax",
+      "metric": {
+        "label": "Tokens",
+        "value": "275M"
+      },
+      "comment": [
+        "El quinto lugar del ranking de prueba completa la lista de ejemplo.",
+        "El valor mostrado carece de validez empírica."
+      ],
+      "specs": [
+        {
+          "label": "Puesto",
+          "value": "#5"
+        },
+        {
+          "label": "Estado",
+          "value": "Simulado"
+        }
+      ]
+    }
+  ]
+}

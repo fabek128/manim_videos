@@ -1,0 +1,9 @@
+id: top
+aliases:
+  - losmas
+  - lostops
+  - ranking
+engine: manim
+entrypoint: scene.py
+scene_class: TopScene
+config_subdir: top

@@ -88,6 +88,27 @@ Story y carruseles cuadrado/vertical de tres slides. Para usar IA, activar
 `image_generation.enabled` y definir un modelo OpenRouter real; los ejemplos
 desactivan IA para ser reproducibles y no consumir créditos.
 
+### Fondos reutilizables
+
+El tenant `agente32` tiene fondos verticales reutilizables en
+`tenants/agente32/assets/backgrounds/`. Se generaron diez fondos sin texto ni
+logos sobre tecnología, IA, robótica y ciencia. Cada fondo pasa por Vision QA
+antes de quedar disponible; el manifest y el costo real están en
+`assets/backgrounds/manifest.json`, y el detalle de las revisiones en
+`assets/backgrounds/vision_review.json`.
+
+Cuando una config no declara `background_image_path`, `image_generation` ni
+`web_capture`, `generator.py` selecciona automáticamente uno de esos fondos
+de manera determinística por tenant/proyecto/slide. Para conservar el fondo
+procedural anterior, declarar `background_mode: "solid"`.
+
+Para regenerar o ampliar la colección:
+
+```bash
+python scripts/generate_backgrounds.py --tenant agente32
+python scripts/generate_backgrounds.py --tenant agente32 --only 1 4 8 --force
+```
+
 Los carruseles también soportan slides `type: "code"`. El código se define en
 el campo `code`, envuelto en `<code>...</code>`, y se renderiza con
 `assets/fonts/FiraCode-Regular.ttf`, numeración de líneas y panel monoespaciado.
@@ -100,24 +121,27 @@ assets globales permanecen en la raíz del repositorio.
 
 ```text
 tenants/agente32/
-  configs/images/      # YAML de placas y carruseles
-  assets/              # Logos, fuentes propias del tenant
-  videos/              # Escenas Manim del tenant
-  media/               # Output renderizado
-  output/              # Imágenes generadas
-  .env                 # Claves específicas del tenant (gitignored)
-  tenant.yaml          # Manifest con id, namespace, brand, social
+  configs/images/          # YAML de placas y carruseles
+  configs/videos/top/      # JSONs genéricos del top (title/items/audio)
+  assets/                  # Logos, fondos, sonidos propios (pisan a global)
+  videos/                  # Solo escenas únicas (intro, logos)
+  overrides/videos/top/    # Opcional: TopScene que hereda de BaseTopScene
+  media/videos/top/<slug>/ # Output tenant-aislado
+  tenant.yaml              # Manifest con brand.footer_logos, default_theme, handle
 
-assets/fonts/            # Fuentes compartidas por todos los tenants
-assets/logos/            # Logos compartidos (ej. fabian128k)
-templates/               # Prompts y guías de diseño
+assets/                    # Recursos compartidos (solo lectura)
+  backgrounds/             # Pool global para posts y videos
+  logos/                   # Logos proveedores reutilizables
+generators/videos/top/     # Generador global reutilizable (descriptor + entrypoint)
+src/noticia_carrusel/video_generators/top/ # Lógica común
 ```
 
 La resolución de recursos sigue prioridad tenant → compartido:
-un logo `logos/agente32/agente32.svg` se resuelve primero en el
+un logo `logos/openai/openai_paths.svg` se resuelve primero en el
 tenant y, si no existe, en `assets/logos/`.
 
 ## Estructura
+
 
 ```text
 scripts/
@@ -126,10 +150,36 @@ scripts/
   publish_final.py       # Publicación con namespace aislado por tenant
   promptgate_client.py   # Cliente OpenAI-compatible para texto
 src/noticia_carrusel/    # Configuración, proveedor, visión y render
+  web_capture/           # Captura de URLs (Playwright) + cámara zoom/pan
 tenants/                 # Carpetas por marca/tenant
 templates/               # Prompts de diseño y guías reutilizables
 assets/fonts/            # Fuentes TTF/OTF del sistema editorial
 ```
+
+### Captura web + cámara (zoom/pan)
+
+Screenshots de URLs (Playwright) como fondo de un post, o como clip de
+video con zoom/pan animado (OpenCV + ffmpeg, sin Manim). Ver
+[`docs/web-capture.md`](docs/web-capture.md).
+
+### Generador de noticias por niveles
+
+Para trabajar desde una URL o investigar un tema completo:
+
+```bash
+python scripts/generate_news.py --level 1 \
+  --url "https://ejemplo.com/noticia" --format short
+python scripts/generate_news.py --level 2 \
+  --topic "nuevo modelo de IA de OpenAI"
+python scripts/generate_news.py --level 3 \
+  --topic "nuevo modelo de IA de OpenAI" --select 1 --format carousel5
+```
+
+Nivel 1 analiza una única URL y genera una pieza mínima; nivel 2 busca hasta
+3 fuentes y devuelve opciones; nivel 3 contrasta hasta 6 fuentes y genera un
+informe profundo. Ver [`docs/news-generator.md`](docs/news-generator.md).
+Toda pieza visual pasa por el rol de visión antes de entregarse, con un
+máximo de 3 regeneraciones y detención en la cuarta evaluación fallida.
 
 ## Uso rápido
 

@@ -322,6 +322,10 @@ templates/
   "escribí algo sobre X"), leer además `skills/contenido.md`,
   `skills/generador_imagenes.md`, `docs/agent-mode.md` y el
   template correspondiente de `templates/posts/`.
+  Para contenido NUEVO, leer también `docs/crear-posts-y-formatos.md`
+  (qué tipos de post se pueden generar y qué preguntarle al usuario
+  para cada uno). Toda la documentación de `docs/` está disponible para
+  los agentes: consultarla antes de suponer cómo se arma una pieza.
   Si la tarea corresponde a un tipo de video con skill específica
   (`skills/los_mas_usados.md`, etc.), leerla también. No esperar a que el
   usuario lo pida: las skills se levantan solas. Las skills son
@@ -503,6 +507,7 @@ python build.py                          # Renderizar todas (preview activado)
 python build.py --video lomas -f post    # Post vertical 1080x1440@30
 python build.py --video lomas --no-format -q high  # 1080p60 estándar
 python build.py --video intro -o         # Abrir con reproductor del sistema
+python build.py --video lomas --serve    # Renderizar y ver en el navegador (servidor local)
 python build.py --combine                # Combinar todas en un video
 python build.py --combine -q high        # Combinar en alta calidad
 python build.py --combine -o             # Combinar y abrir resultado
@@ -518,6 +523,15 @@ python build.py --combine -o             # Combinar y abrir resultado
 > `media/videos/<módulo>/<H>p<fps>/`. Instagram es el destino por defecto del repo.
 
 > **`--preview` vs `--open`**: `--preview` es la ventana nativa de manim durante el render (activado por defecto). `--open` abre el video terminado con el reproductor del sistema. Usar `--no-preview` para desactivar el preview.
+
+> **Servidor local (`--serve`)**: levanta `scripts/serve_videos.py` en
+> background (`0.0.0.0:8300`; puerto configurable con `SERVE_PORT`) y, por
+> cada video renderizado, muestra la URL de red con player en el navegador
+> (`http://<ip-lan>:8300/watch?path=...`). El índice con todos los videos
+> generados queda en `http://<ip-lan>:8300/` (accesible desde cualquier
+> dispositivo de la red local). El servidor solo expone videos `.mp4`/`.webm`;
+> el resto del repo (`.env`, configs) devuelve 404. Para correrlo sin
+> build.py: `python scripts/serve_videos.py [--port N] [--open]`.
 
 ### Calidades
 

@@ -254,7 +254,38 @@ python build.py --video intro --open
 
 # Combinar todas las escenas en un solo video
 python build.py --combine
+
+# Renderizar y ver el resultado en el navegador (levanta el servidor local)
+python build.py --video intro --serve
 ```
+
+## Servir videos en el navegador
+
+`scripts/serve_videos.py` es un servidor HTTP local (solo stdlib, sin
+dependencias) que muestra los videos generados con un player en el
+navegador. Escucha en `0.0.0.0`, así que la URL es accesible desde
+cualquier dispositivo de la red local (celular, tablet, otra máquina).
+
+```bash
+# Levantar el servidor (índice en http://<ip-lan>:8300/)
+python scripts/serve_videos.py
+python scripts/serve_videos.py --port 9001   # puerto custom
+python scripts/serve_videos.py --open        # abrir el navegador
+
+# O directamente al renderizar: levanta el servidor en background y
+# muestra la URL de cada video recién generado.
+python build.py --video intro --serve
+```
+
+- El índice (`/`) lista todos los videos `.mp4`/`.webm` del repo, el más
+  reciente primero, con player y link de descarga.
+- Cada video tiene su página `/watch?path=<ruta>` y una URL directa de
+  archivo `/v/<ruta>` con soporte `Range` (permite adelantar/retroceder).
+- Por seguridad el servidor **solo** expone videos y las páginas del
+  índice: `.env`, configs y el resto del repo devuelven 404.
+- `SERVE_PORT` en el entorno cambia el puerto default (8300).
+- `build.py --serve` deja el servidor corriendo en background; el log vive
+  en `logs/serve_videos.log`.
 
 ## PromptGate local
 

@@ -10,6 +10,7 @@ Uso:
     python build.py --open             # Abrir video después de renderizar
     python build.py --video intro -f reel  # Formato Instagram (Reel 9:16)
     python build.py --combine          # Combinar todos en un solo video
+    python build.py --serve            # Renderizar y mostrar la URL del video (servidor local)
 """
 
 import argparse
@@ -37,6 +38,9 @@ MEDIA_DIR = Path("media")
 POSTS_DIR = MEDIA_DIR / "posts"
 ACTIVE_TENANT: TenantContext | None = None
 POST_MAX_TOKENS = 8000
+# Servidor local de videos (scripts/serve_videos.py); se activa con --serve.
+SERVE_BASE: str | None = None
+_SERVE_BROWSER_OPENED = False
 QUALITY_FLAGS = {
     "low": "-ql",      # 480p15
     "medium": "-qm",   # 720p30
@@ -105,6 +109,28 @@ def trim_audio_to_video(path: Path) -> None:
         capture_output=True,
     )
     tmp.replace(path)
+
+
+def maybe_print_video_url(output_path: Path) -> None:
+    """Imprime la URL de red del video si el servidor local está activo (--serve)."""
+    if not SERVE_BASE:
+        return
+    try:
+        from scripts.serve_videos import video_url, watch_url
+        rel = output_path.resolve().relative_to(REPO_ROOT)
+        watch = watch_url(SERVE_BASE, REPO_ROOT, rel)
+        print(f"   🌐 Ver en navegador: {watch}")
+        print(f"   🔗 Archivo:          {video_url(SERVE_BASE, REPO_ROOT, rel)}")
+        global _SERVE_BROWSER_OPENED
+        if not _SERVE_BROWSER_OPENED:
+            _SERVE_BROWSER_OPENED = True
+            import webbrowser
+            try:
+                webbrowser.open(watch)  # headless: falla silencioso, la URL ya quedó impresa
+            except Exception:
+                pass
+    except Exception as exc:
+        print(f"   ⚠ No se pudo mostrar la URL del video: {exc}")
 
 
 def open_video(file_path: Path) -> bool:
@@ -524,6 +550,7 @@ def render_scene(
         if open_after:
             video_path = output_path_for(scene, quality, fmt)
             open_video(video_path)
+        maybe_print_video_url(output_path)
         return True
     except subprocess.CalledProcessError as e:
         print(f"   ❌ Error renderizando {scene['class']}: {e}")
@@ -599,6 +626,7 @@ def render_scene(
         if open_after:
             video_path = output_path_for(scene, quality, fmt)
             open_video(video_path)
+        maybe_print_video_url(output_path)
         return True
     except subprocess.CalledProcessError as e:
         print(f"   ❌ Error renderizando {scene['class']}: {e}")
@@ -640,6 +668,7 @@ def combine_videos(
         subprocess.run(cmd, check=True, capture_output=True)
         print(f"✅ Video combinado: {output_file}")
         list_file.unlink()
+        maybe_print_video_url(output_file)
         if open_after:
             open_video(output_file)
         return True
@@ -698,6 +727,7 @@ Ejemplos:
     parser.add_argument("--no-preview", action="store_true", help="Desactivar preview de manim (ya es default)")
     parser.add_argument("--combine", "-c", action="store_true", help="Combinar todas las escenas en un solo video")
     parser.add_argument("--open", "-o", action="store_true", help="Abrir video con el reproductor del sistema después de renderizar")
+    parser.add_argument("--serve", action="store_true", help="Levantar el servidor local de videos y mostrar la URL para verlos en el navegador")
     parser.add_argument("--no-post", action="store_true", help="No generar el texto del post asociado")
     parser.add_argument("--no-format", action="store_true", help="Desactivar formato Instagram automático; usa las calidades -q estándar")
     parser.add_argument("--config", type=str, help="Config JSON relativo dentro del generador (solo para generadores)")
@@ -733,6 +763,16 @@ Ejemplos:
     if args.list:
         _list_generators_and_scenes(scenes)
         return
+
+    # Servidor local: garantiza el proceso corriendo y recuerda la base URL.
+    if args.serve:
+        global SERVE_BASE
+        try:
+            from scripts.serve_videos import ensure_server
+            SERVE_BASE = ensure_server()
+            print(f"   🌐 Servidor de videos: {SERVE_BASE}/")
+        except Exception as exc:
+            print(f"   ⚠ No se pudo levantar el servidor de videos ({exc})")
 
     # Modo: combinar (solo escenas tenant por ahora)
     if args.combine:

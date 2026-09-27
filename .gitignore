@@ -32,3 +32,6 @@ Thumbs.db
 tenants/*/.env
 !tenants/*/.env.example
 *.swo
+
+# Servidor local de videos (log del daemon)
+logs/

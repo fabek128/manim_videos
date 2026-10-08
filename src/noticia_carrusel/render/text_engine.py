@@ -230,8 +230,22 @@ class TextEngine:
                     continue
                 x0 = xy[0] + round(draw.textlength(line[:start], font=font))
                 x1 = x0 + round(draw.textlength(line[start:start + len(phrase)], font=font))
+                # Mide la tinta rasterizada del fragmento; textbbox incluye
+                # ascender/descender vacíos y no representa el padding visible.
+                phrase_mask = Image.new("1", image.size)
+                ImageDraw.Draw(phrase_mask).text(
+                    (x0, y), line[start:start + len(phrase)], font=font, fill=1
+                )
+                ink_box = phrase_mask.getbbox()
+                if ink_box is None:
+                    continue
                 draw.rounded_rectangle(
-                    (x0 - padding, y - padding // 2, x1 + padding, y + font.size + padding // 2),
+                    (
+                        ink_box[0] - padding,
+                        ink_box[1] - padding,
+                        ink_box[2] - 1 + padding,
+                        ink_box[3] - 1 + padding,
+                    ),
                     radius=6,
                     fill=highlight_color,
                 )

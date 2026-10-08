@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+import random
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -16,6 +18,59 @@ from .web_capture import api as web_capture_api
 from .web_capture.cache import cached_path as web_capture_cached_path
 
 QUALITY_ALIASES = frozenset({"draft", "low", "medium", "high"})
+MODEL_CATALOG_PATH = Path(__file__).with_name("image_models.jsonl")
+
+
+@dataclass
+class ModelEntry:
+    model: str
+    categories: list[str]
+    weight: float = 1.0
+
+
+def _load_model_catalog(path: Path | None = None) -> list[ModelEntry]:
+    catalog_path = path or MODEL_CATALOG_PATH
+    entries: list[ModelEntry] = []
+    if not catalog_path.is_file():
+        return entries
+    for line_number, line in enumerate(catalog_path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+            model, categories = record["model"], record["categories"]
+            weight = record.get("weight", 1)
+            if not isinstance(model, str) or not model.strip():
+                raise ValueError("model debe ser un string no vacío")
+            if not isinstance(categories, list) or not all(isinstance(c, str) for c in categories):
+                raise ValueError("categories debe ser una lista de strings")
+            if isinstance(weight, bool) or not isinstance(weight, (int, float)) or weight < 0:
+                raise ValueError("weight debe ser numérico y no negativo")
+            entries.append(ModelEntry(model.strip(), categories, float(weight)))
+        except (json.JSONDecodeError, KeyError, ValueError) as exc:
+            raise ImageProviderError(f"Catálogo JSONL inválido, línea {line_number}: {exc}") from exc
+    return entries
+
+
+def _select_model_for_category(category: str, catalog: list[ModelEntry] | None = None) -> str | None:
+    entries = _load_model_catalog() if catalog is None else catalog
+    eligible = [entry for entry in entries if category in entry.categories and entry.weight > 0]
+    if not eligible:
+        return None
+    return random.choices([e.model for e in eligible], weights=[e.weight for e in eligible], k=1)[0]
+
+
+def _model_for(image_config: ImageGenerationConfig, quality: str | None = None) -> str:
+    configured = (image_config.model or "").strip()
+    category = (quality or configured or "draft").strip().lower()
+    if category == "example":
+        category = "draft"
+    if configured and configured.lower() not in {"draft", "example", "low", "medium", "high"}:
+        return configured
+    model = _select_model_for_category(category)
+    if model:
+        return model
+    raise ImageProviderError(f"No hay modelos configurados para la categoría '{category}' en {MODEL_CATALOG_PATH}")
 
 
 @dataclass
@@ -26,28 +81,6 @@ class GenerateOutput:
     total_cost_usd: float = 0.0
     resumen_path: Path | None = None
     reused_paths: list[Path] = field(default_factory=list)
-
-
-def _model_for(image_config: ImageGenerationConfig, quality: str | None = None) -> str:
-    configured = (quality or image_config.model or "").strip()
-    if configured and configured != "MODEL_NAME_HERE":
-        aliases = {
-            "high": os.environ.get("OPENROUTER_IMAGE_QUALITY_HIGH_MODEL"),
-            "medium": os.environ.get("OPENROUTER_IMAGE_QUALITY_MEDIUM_MODEL"),
-            "low": os.environ.get("OPENROUTER_IMAGE_QUALITY_LOW_MODEL"),
-        }
-        if configured in {"draft", "example"}:
-            configured = os.environ.get("OPENROUTER_IMAGE_DRAFT_MODELS", "").split(",")[0].strip()
-        else:
-            configured = aliases.get(configured, configured)
-        if configured:
-            return configured
-    quality_fallback = os.environ.get("OPENROUTER_IMAGE_QUALITY_HIGH_MODEL")
-    if quality_fallback:
-        return quality_fallback
-    raise ImageProviderError(
-        "Falta image_generation.model o OPENROUTER_IMAGE_QUALITY_HIGH_MODEL"
-    )
 
 
 def _intermediate_path(tenant: TenantContext, output_dir: Path, index: int) -> Path:

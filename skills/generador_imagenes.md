@@ -315,9 +315,9 @@ Cada llamada a un modelo de imagen (`image_generation.enabled: true`) genera un 
 
 | `--quality` | Modelo usado | Cuándo usar |
 |---|---|---|
-| `draft` (default) | `OPENROUTER_IMAGE_DRAFT_MODELS` | Prototipos, iteraciones |
-| `low` / `medium` | Modelos intermedios | Revisiones |
-| `high` | `OPENROUTER_IMAGE_QUALITY_HIGH_MODEL` | Entrega final |
+| `draft` (default) | selección ponderada desde `image_models.jsonl` (categoría `draft`) | Prototipos, iteraciones |
+| `low` / `medium` | selección ponderada desde `image_models.jsonl` (categorías `low`/`medium`) | Revisiones |
+| `high` | selección ponderada desde `image_models.jsonl` (categoría `high`) | Entrega final |
 
 El costo se registra automáticamente en `resumen.md` (junto al proyecto en `content/<slug>/`, o en `output/<output_dir>/` si no tiene `content_slug`).
 

@@ -100,10 +100,11 @@ generarlo por IA.
 
 ## 7. Calidad de imagen
 
-`--quality draft` (default) usa `OPENROUTER_IMAGE_DRAFT_MODELS`. Usar
-`draft` para todo prototipo e iteración. Recién en la entrega final:
-`--quality high`. No tocar `image_generation.model` en el YAML para
-esto: el flag lo sobrescribe en tiempo de ejecución.
+`--quality draft` (default) elige un modelo por peso desde la categoría `draft`
+de `src/noticia_carrusel/image_models.jsonl`. Usar `draft` para todo prototipo e
+iteración. Recién en la entrega final: `--quality high`. No tocar
+`image_generation.model` en el YAML para esto: el flag selecciona la categoría
+en tiempo de ejecución.
 
 ## 8. Costos de generación por IA
 

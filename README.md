@@ -300,18 +300,22 @@ PROMPTGATE_TIMEOUT=120
 PROMPTGATE_MODEL=coder-rata
 ```
 
-Modelos OpenRouter para generación de imágenes:
+Modelos OpenRouter para generación de imágenes (configuración en `src/noticia_carrusel/image_models.jsonl`):
 
-```env
-OPENROUTER_IMAGE_DRAFT_MODELS=meta/muse-image,black-forest-labs/flux.2-klein-4b
-OPENROUTER_IMAGE_QUALITY_HIGH_MODEL=google/gemini-3.1-flash-image
-OPENROUTER_IMAGE_QUALITY_MEDIUM_MODEL=google/gemini-2.5-flash-image
-OPENROUTER_IMAGE_QUALITY_LOW_MODEL=bytedance-seed/seedream-4.5
+Cada línea es un JSON con: `model` (string), `categories` (lista: `draft`, `low`, `medium`, `high`), `weight` (float ≥ 0, opcional, default 1). La selección es ponderada por peso dentro de la categoría.
+
+```jsonl
+{"model":"inclusionai/ming-image-0.1-design","categories":["draft"],"weight":1}
+{"model":"meta/muse-image","categories":["draft"],"weight":1}
+{"model":"recraft/recraft-v4.1-flash","categories":["draft"],"weight":1}
+{"model":"sourceful/riverflow-v2.5-fast","categories":["draft"],"weight":1}
+{"model":"bytedance-seed/seedream-5-0-pro","categories":["draft"],"weight":1}
+{"model":"openai/gpt-image-2.5-sunburst","categories":["draft"],"weight":1}
 ```
 
-Los modelos de calidad están ordenados por nivel: `HIGH` es el mejor,
-`MEDIUM` el intermedio y `LOW` el tercero. Los modelos de `DRAFT` se reservan
-para borradores y ejemplos.
+El flag `--quality` (draft/low/medium/high) determina la categoría; si `image_generation.model` en el YAML es un nombre explícito (no un alias), se usa ese modelo directamente.
+
+Las variables de entorno `OPENROUTER_IMAGE_DRAFT_MODELS`, `OPENROUTER_IMAGE_QUALITY_*_MODEL` ya no se usan para seleccionar el modelo; se mantienen solo como fallback si el catálogo no tiene entradas para la categoría solicitada.
 
 Descubrir modelos:
 
@@ -471,18 +475,22 @@ PROMPTGATE_AUTH=none
 PROMPTGATE_TIMEOUT=120
 PROMPTGATE_MODEL=coder-rata
 ```
-Modelos OpenRouter para generación de imágenes:
+Modelos OpenRouter para generación de imágenes (configuración en `src/noticia_carrusel/image_models.jsonl`):
 
-```env
-OPENROUTER_IMAGE_DRAFT_MODELS=meta/muse-image,black-forest-labs/flux.2-klein-4b
-OPENROUTER_IMAGE_QUALITY_HIGH_MODEL=google/gemini-3.1-flash-image
-OPENROUTER_IMAGE_QUALITY_MEDIUM_MODEL=google/gemini-2.5-flash-image
-OPENROUTER_IMAGE_QUALITY_LOW_MODEL=bytedance-seed/seedream-4.5
+Cada línea es un JSON con: `model` (string), `categories` (lista: `draft`, `low`, `medium`, `high`), `weight` (float ≥ 0, opcional, default 1). La selección es ponderada por peso dentro de la categoría.
+
+```jsonl
+{"model":"inclusionai/ming-image-0.1-design","categories":["draft"],"weight":1}
+{"model":"meta/muse-image","categories":["draft"],"weight":1}
+{"model":"recraft/recraft-v4.1-flash","categories":["draft"],"weight":1}
+{"model":"sourceful/riverflow-v2.5-fast","categories":["draft"],"weight":1}
+{"model":"bytedance-seed/seedream-5-0-pro","categories":["draft"],"weight":1}
+{"model":"openai/gpt-image-2.5-sunburst","categories":["draft"],"weight":1}
 ```
 
-Los modelos de calidad están ordenados por nivel: `HIGH` es el mejor,
-`MEDIUM` el intermedio y `LOW` el tercero. Los modelos de `DRAFT` se reservan
-para borradores y ejemplos.
+El flag `--quality` (draft/low/medium/high) determina la categoría; si `image_generation.model` en el YAML es un nombre explícito (no un alias), se usa ese modelo directamente.
+
+Las variables de entorno `OPENROUTER_IMAGE_DRAFT_MODELS`, `OPENROUTER_IMAGE_QUALITY_*_MODEL` ya no se usan para seleccionar el modelo; se mantienen solo como fallback si el catálogo no tiene entradas para la categoría solicitada.
 
 Descubrir modelos:
 
